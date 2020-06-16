@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: tenant-management-service
+  profiles:
+    active:
+      default
+  cloud:
+    config:
+      #uri: http://ec2-3-6-82-226.ap-south-1.compute.amazonaws.com:8888
+      uri: http://localhost:8888
