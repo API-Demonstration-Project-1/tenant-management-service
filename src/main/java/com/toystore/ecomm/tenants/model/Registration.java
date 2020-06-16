@@ -124,8 +124,8 @@ public class Registration   {
    * This indicates whether Tenant Registration is verified or not
    * @return tenantVerified
   **/
-  @ApiModelProperty(required = true, value = "This indicates whether Tenant Registration is verified or not")
-  @NotNull
+  @ApiModelProperty(required = false, value = "This indicates whether Tenant Registration is verified or not")
+  //@NotNull
 
 
   public String getTenantVerified() {

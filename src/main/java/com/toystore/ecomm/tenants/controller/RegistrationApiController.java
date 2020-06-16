@@ -56,7 +56,7 @@ public class RegistrationApiController implements RegistrationApi {
             	tenantInfo.setTenantEmail(body.getTenantEmail());
             	tenantInfo.setTenantUsername(body.getTenantUsername());
             	tenantInfo.setTenantPassword(body.getTenantPassword());
-            	tenantInfo.setTenantVerified("N");
+            	//tenantInfo.setTenantVerified("N");
             	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
             	tenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
             	tenantInfo.setCreatedBy("ptms-service");
