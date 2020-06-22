@@ -9,24 +9,38 @@ import com.toystore.ecomm.tenants.model.Error;
 import com.toystore.ecomm.tenants.model.Login;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-13T11:31:55.085Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
 @Api(value = "login", description = "the login API")
 @RequestMapping(value = "/ptms")
 public interface LoginApi {
+
+    @ApiOperation(value = "Login_DELETE", nickname = "loginDELETE", notes = "Delete a Login by loginId", tags={ "login", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = ""),
+        @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
+    @RequestMapping(value = "/login",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.DELETE)
+    ResponseEntity<Void> loginDELETE();
+
+
+    @ApiOperation(value = "Login_GET", nickname = "loginGET", notes = "Get a Login by loginId", response = Login.class, tags={ "login", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "", response = Login.class),
+        @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
+    @RequestMapping(value = "/login",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.GET)
+    ResponseEntity<Login> loginGET();
+
 
     @ApiOperation(value = "Login_POST", nickname = "loginPOST", notes = "Login using Username & Password", response = Login.class, tags={ "login", })
     @ApiResponses(value = { 
@@ -37,5 +51,16 @@ public interface LoginApi {
         consumes = { "application/json" },
         method = RequestMethod.POST)
     ResponseEntity<Login> loginPOST();
+
+
+    @ApiOperation(value = "Login_PUT", nickname = "loginPUT", notes = "Update a Login by loginId", response = Login.class, tags={ "login", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "", response = Login.class),
+        @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
+    @RequestMapping(value = "/login",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.PUT)
+    ResponseEntity<Login> loginPUT(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Login body);
 
 }
