@@ -11,4 +11,9 @@ import com.toystore.ecomm.tenants.model.TenantInfo;
 public interface TenantRepository extends CrudRepository<TenantInfo, Integer> {
 	//List<TenantInfo> findByTenantUsernameAndPassword(String tenantUsername, String tenantPassword);
 	List<TenantInfo> findByTenantId(Integer tenantId);
+	
+	List<TenantInfo> findByTenantName(String tenantName);
+	List<TenantInfo> findByTenantUsername(String tenantUsername);
+	List<TenantInfo> findByTenantEmail(String tenantEmail);
+	List<TenantInfo> findByTenantVerified(String tenantVerified);
 }
