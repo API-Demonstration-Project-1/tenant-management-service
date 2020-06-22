@@ -21,7 +21,7 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-13T11:31:55.085Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
 @Controller
 public class LoginApiController implements LoginApi {
@@ -38,7 +38,40 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
+    public ResponseEntity<Void> loginDELETE() {
+        String accept = request.getHeader("Accept");
+        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    public ResponseEntity<Login> loginGET() {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+                return new ResponseEntity<Login>(objectMapper.readValue("{  \"userPassword\" : \"userPassword\",  \"userName\" : \"userName\"}", Login.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (IOException e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<Login>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return new ResponseEntity<Login>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
     public ResponseEntity<Login> loginPOST() {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+                return new ResponseEntity<Login>(objectMapper.readValue("{  \"userPassword\" : \"userPassword\",  \"userName\" : \"userName\"}", Login.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (IOException e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<Login>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return new ResponseEntity<Login>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    public ResponseEntity<Login> loginPUT(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Login body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {

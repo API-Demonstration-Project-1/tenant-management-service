@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * Registration
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-13T11:31:55.085Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
 public class Registration   {
   @JsonProperty("tenantName")
@@ -124,8 +124,8 @@ public class Registration   {
    * This indicates whether Tenant Registration is verified or not
    * @return tenantVerified
   **/
-  @ApiModelProperty(required = false, value = "This indicates whether Tenant Registration is verified or not")
-  //@NotNull
+  @ApiModelProperty(required = true, value = "This indicates whether Tenant Registration is verified or not")
+  @NotNull
 
 
   public String getTenantVerified() {
