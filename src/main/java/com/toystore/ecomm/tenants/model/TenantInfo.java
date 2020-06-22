@@ -1,6 +1,7 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
@@ -10,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -47,6 +49,9 @@ public class TenantInfo   {
   
   @Column(name = "CREATED_BY", nullable = false)
   private String createdBy = null;
+  
+  @OneToMany(mappedBy = "tenant")
+  private List<SubscriptionInfo> subscriptionInfoList;
   
   public Integer getTenantId() {
 	return tenantId;
