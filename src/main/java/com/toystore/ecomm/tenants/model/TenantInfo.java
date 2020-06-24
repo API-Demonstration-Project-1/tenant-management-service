@@ -221,7 +221,7 @@ public TenantInfo withId(Integer id){
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Registration {\n");
+    //sb.append("class Registration {\n");
     
     sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
     sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");

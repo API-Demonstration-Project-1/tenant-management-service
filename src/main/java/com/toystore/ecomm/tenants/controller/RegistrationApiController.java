@@ -105,9 +105,18 @@ public class RegistrationApiController implements RegistrationApi {
     }
 
     public ResponseEntity<Registrationresponse> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
+    	log.info("registrationPOST() invoked");
+    	log.debug("registrationPOST() invoked with Request body: " + body);
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+            	
+            	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername()))
+            		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \""+ body.getTenantUsername()  + " Already Exists!!!\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
+            
+            	if (!tenantService.isTenantEmailUnique(body.getTenantEmail()))
+            		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \""+ body.getTenantEmail()  + " Already Exists!!!\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
+            	
             	TenantInfo tenantInfo = new TenantInfo();
             	tenantInfo.setTenantName(body.getTenantName());
             	tenantInfo.setTenantEmail(body.getTenantEmail());
@@ -120,13 +129,16 @@ public class RegistrationApiController implements RegistrationApi {
             	
             	tenantService.saveTenantInfo(tenantInfo);
             	
+            	log.trace("Tenant Info POJO: " + tenantInfo);
+            	
                 return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"The Registration has been created successfully\"}", Registrationresponse.class), HttpStatus.CREATED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
+        
+        log.info("registrationPOST() exited");
         return new ResponseEntity<Registrationresponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 

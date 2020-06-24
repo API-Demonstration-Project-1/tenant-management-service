@@ -31,4 +31,12 @@ public class TenantService {
 		existingTenantInfo.setTenantVerified("Y");
 		return tenantRepository.save(existingTenantInfo);
 	}
+	
+	public boolean isTenantUsernameUnique(String tenantUsername) {
+		return ((tenantRepository.findByTenantUsername(tenantUsername).size()) > 0) ? false : true;
+	}
+	
+	public boolean isTenantEmailUnique(String tenantEmail) {
+		return ((tenantRepository.findByTenantEmail(tenantEmail).size()) > 0) ? false : true;
+	}
 }
