@@ -6,6 +6,7 @@ import java.util.Objects;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Column;
@@ -40,6 +41,9 @@ public class TenantInfo   {
 
   @Column(name = "TENANT_VERIFIED", nullable = false)
   private String tenantVerified = null;
+  
+  @Column(name = "TENANT_VERIFICATIONCODE", nullable = false)
+  private String tenantVerificationCode = null;
 
   @Column(name = "CREATED_TS", nullable = false)
   private Timestamp createdTS = null;
@@ -142,7 +146,7 @@ public TenantInfo tenantName(String tenantName) {
   }
 
   public void setTenantPassword(String tenantPassword) {
-    this.tenantPassword = tenantPassword;
+    this.tenantPassword = BCrypt.hashpw(tenantPassword, BCrypt.gensalt());
   }
 
   public TenantInfo tenantVerified(String tenantVerified) {
@@ -166,7 +170,15 @@ public TenantInfo tenantName(String tenantName) {
     this.tenantVerified = tenantVerified;
   }
 
-  public Timestamp getCreatedTS() {
+  public String getTenantVerificationCode() {
+	return tenantVerificationCode;
+}
+
+public void setTenantVerificationCode(String tenantVerificationCode) {
+	this.tenantVerificationCode = tenantVerificationCode;
+}
+
+public Timestamp getCreatedTS() {
 	return createdTS;
 }
 
