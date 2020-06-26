@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-17T19:33:56.927Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
 
 @Api(value = "registration", description = "the registration API")
 @RequestMapping(value = "/ptms")
@@ -66,6 +67,15 @@ public interface RegistrationApi {
         consumes = { "application/json" },
         method = RequestMethod.PUT)
     ResponseEntity<Registration> registrationByTenantIdPUT(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body);
+
+
+    @ApiOperation(value = "RegistrationEmailverificationByTenantId_GET", nickname = "registrationEmailverificationByTenantIdGET", notes = "", response = Registrationresponse.class, tags={ "registration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "", response = Registrationresponse.class) })
+    @RequestMapping(value = "/registration/{tenantId}/emailverification",
+        produces = { "application/json" },
+        method = RequestMethod.GET)
+    ResponseEntity<Registrationresponse> registrationEmailverificationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@NotNull @ApiParam(value = "This is the Verification Code for this tenant", required = true) @Valid @RequestParam(value = "code", required = true) String code);
 
 
     @ApiOperation(value = "Registration_GET", nickname = "registrationGET", notes = "Get a list of Registration", response = Registration.class, responseContainer = "List", tags={ "registration", })

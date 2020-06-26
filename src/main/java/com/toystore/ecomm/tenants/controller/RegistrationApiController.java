@@ -1,29 +1,40 @@
 package com.toystore.ecomm.tenants.controller;
 
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.model.Error;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
+import com.toystore.ecomm.tenants.services.EmailService;
 import com.toystore.ecomm.tenants.services.TenantService;
+import com.toystore.ecomm.tenants.util.RandomStringGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.constraints.*;
 import javax.validation.Valid;
+import javax.mail.Message;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
 
 @Controller
 public class RegistrationApiController implements RegistrationApi {
@@ -33,10 +44,13 @@ public class RegistrationApiController implements RegistrationApi {
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
-
+    
     @Autowired
     TenantService tenantService;
     
+    @Autowired
+    EmailService emailService;
+
     @org.springframework.beans.factory.annotation.Autowired
     public RegistrationApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
@@ -90,44 +104,33 @@ public class RegistrationApiController implements RegistrationApi {
         return new ResponseEntity<Registration>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<Registration>> registrationGET() {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<Registration>>(objectMapper.readValue("[ {  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"}, {  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Registration>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<Registration>>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<Registrationresponse> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	TenantInfo tenantInfo = new TenantInfo();
-            	tenantInfo.setTenantName(body.getTenantName());
-            	tenantInfo.setTenantEmail(body.getTenantEmail());
-            	tenantInfo.setTenantUsername(body.getTenantUsername());
-            	tenantInfo.setTenantPassword(body.getTenantPassword());
-            	tenantInfo.setTenantVerified("N");
-            	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-            	tenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-            	tenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-            	
-            	tenantService.saveTenantInfo(tenantInfo);
-            	
-                return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"The Registration has been created successfully\"}", Registrationresponse.class), HttpStatus.CREATED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<Registrationresponse>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<Registrationresponse> registrationEmailverificationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@NotNull @ApiParam(value = "This is the Verification Code for this tenant", required = true) @Valid @RequestParam(value = "code", required = true) String code) {
+    	log.info("registrationEmailverificationByTenantIdGET() invoked");
+    	log.debug("registrationEmailverificationByTenantIdGET() invoked with URI Param: " + tenantId + " Query Param: " + code);
+    	
+    	try {
+    		if (!tenantService.isTenantVerified(Integer.parseInt(tenantId))) {
+		    	if (tenantService.isTenantRegistered(Integer.parseInt(tenantId), code)) {
+		    		tenantService.updateTenantInfo(Integer.parseInt(tenantId));
+		    		
+		    		log.info("registrationEmailverificationByTenantIdGET() exited");
+		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Registration is Verified\"}", Registrationresponse.class), HttpStatus.OK);
+		    	} else {
+		    		log.info("registrationEmailverificationByTenantIdGET() exited");
+		    		
+		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Verification Code is not correct. Please make sure your Verification Code is correct\"}", Registrationresponse.class), HttpStatus.OK);
+		    	}
+    		} else {
+    			log.info("registrationEmailverificationByTenantIdGET() exited");
+    			
+    			return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Registration is Already Verified!!\"}", Registrationresponse.class), HttpStatus.NOT_ACCEPTABLE);
+    		}
+    	} catch(IOException e) {
+    		log.error("Couldn't serialize response for content type application/json", e);
+    		log.info("registrationEmailverificationByTenantIdGET() exited");
+    		
+            return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
     }
 
     public ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
@@ -143,4 +146,60 @@ public class RegistrationApiController implements RegistrationApi {
 
         return new ResponseEntity<List<Registration>>(HttpStatus.NOT_IMPLEMENTED);
     }
+
+    public ResponseEntity<Registrationresponse> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
+    	log.info("registrationPOST() invoked");
+    	log.debug("registrationPOST() invoked with Request body: " + body);
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+            	
+            	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername()))
+            		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \""+ body.getTenantUsername()  + " Already Exists!!!\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
+            
+            	if (!tenantService.isTenantEmailUnique(body.getTenantEmail()))
+            		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \""+ body.getTenantEmail()  + " Already Exists!!!\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
+            	
+            	TenantInfo tenantInfo = new TenantInfo();
+            	tenantInfo.setTenantName(body.getTenantName());
+            	tenantInfo.setTenantEmail(body.getTenantEmail());
+            	tenantInfo.setTenantUsername(body.getTenantUsername());
+            	tenantInfo.setTenantPassword(body.getTenantPassword());
+            	
+            	tenantInfo = tenantService.saveTenantInfo(tenantInfo);
+            	
+            	log.trace("Tenant Info POJO: " + tenantInfo);
+            	
+            	emailService.sendNotification(prepareEmail(tenantInfo.getTenantId(), tenantInfo.getTenantEmail(), tenantInfo.getTenantVerificationCode()));
+            	
+                return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"The Registration has been created successfully. This is your ID: " + tenantInfo.getTenantId() + "\"}", Registrationresponse.class), HttpStatus.CREATED);
+            } catch (IOException e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        
+        log.info("registrationPOST() exited");
+        return new ResponseEntity<Registrationresponse>(HttpStatus.BAD_REQUEST);
+    }
+    
+    
+    private MimeMessagePreparator prepareEmail(Integer tenantId, String toEmail, String verificationCode) {
+    	String htmlMsg = "<h2>To confirm your account, please click " + "<a href=http://localhost:8080/ptms/registration/" + tenantId + "/emailverification?code=" + verificationCode + ">here</a></h2>";
+        
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+
+            public void prepare(MimeMessage mimeMessage) throws Exception {
+            	mimeMessage.setSubject("PTMS - Registration Verification");
+                mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
+                mimeMessage.setFrom(new InternetAddress("donotreply.proarchs@gmail.com"));
+                mimeMessage.addHeader("Content-Type", "application/json");
+                mimeMessage.setContent(htmlMsg, "text/html");
+            }
+        };
+        
+        return preparator;
+    	
+    }
+
 }
