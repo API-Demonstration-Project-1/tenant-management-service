@@ -4,15 +4,18 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -56,6 +59,9 @@ public class TenantInfo   {
   
   @OneToMany(mappedBy = "tenant")
   private List<SubscriptionInfo> subscriptionInfoList;
+  
+  @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private TenantDBInfo tenantDBInfo;
   
   public Integer getTenantId() {
 	return tenantId;
@@ -200,6 +206,14 @@ public String getCreatedBy() {
 
 public void setCreatedBy(String createdBy) {
 	this.createdBy = createdBy;
+}
+
+public TenantDBInfo getTenantDBInfo() {
+	return tenantDBInfo;
+}
+
+public void setTenantDBInfo(TenantDBInfo tenantDBInfo) {
+	this.tenantDBInfo = tenantDBInfo;
 }
 
 public TenantInfo withId(Integer id){

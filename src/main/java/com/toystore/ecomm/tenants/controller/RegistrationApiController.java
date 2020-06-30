@@ -1,24 +1,18 @@
 package com.toystore.ecomm.tenants.controller;
 
-import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.model.Error;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.services.EmailService;
 import com.toystore.ecomm.tenants.services.TenantService;
-import com.toystore.ecomm.tenants.util.RandomStringGenerator;
+import com.toystore.ecomm.tenants.util.EmailNotificationPreparator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
 
 @Controller
@@ -58,7 +48,7 @@ public class RegistrationApiController implements RegistrationApi {
     }
 
     public ResponseEntity<Void> registrationByTenantIdDELETE(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) {
-        String accept = request.getHeader("Accept");
+        //String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -111,9 +101,12 @@ public class RegistrationApiController implements RegistrationApi {
     	try {
     		if (!tenantService.isTenantVerified(Integer.parseInt(tenantId))) {
 		    	if (tenantService.isTenantRegistered(Integer.parseInt(tenantId), code)) {
-		    		tenantService.updateTenantInfo(Integer.parseInt(tenantId));
+		    		TenantInfo updatedTenantInfo = tenantService.updateTenantInfo(Integer.parseInt(tenantId));
+		    		
+		    		emailService.sendNotification(EmailNotificationPreparator.prepareEmailForPostVerification(updatedTenantInfo.getTenantEmail()));
 		    		
 		    		log.info("registrationEmailverificationByTenantIdGET() exited");
+		    		
 		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Registration is Verified\"}", Registrationresponse.class), HttpStatus.OK);
 		    	} else {
 		    		log.info("registrationEmailverificationByTenantIdGET() exited");
@@ -127,7 +120,7 @@ public class RegistrationApiController implements RegistrationApi {
     		}
     	} catch(IOException e) {
     		log.error("Couldn't serialize response for content type application/json", e);
-    		log.info("registrationEmailverificationByTenantIdGET() exited");
+    		log.info("registrationEmailverificationByTenantIdGET() exited with error(s)");
     		
             return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
     	}
@@ -170,7 +163,11 @@ public class RegistrationApiController implements RegistrationApi {
             	
             	log.trace("Tenant Info POJO: " + tenantInfo);
             	
-            	emailService.sendNotification(prepareEmail(tenantInfo.getTenantId(), tenantInfo.getTenantEmail(), tenantInfo.getTenantVerificationCode()));
+            	//Email for Welcome message
+            	emailService.sendNotification(EmailNotificationPreparator.prepareEmailForWelcome(tenantInfo.getTenantEmail()));
+            	
+            	//Email for Registration Verification
+            	emailService.sendNotification(EmailNotificationPreparator.prepareEmailForTenantVerification(tenantInfo.getTenantId(), tenantInfo.getTenantEmail(), tenantInfo.getTenantVerificationCode()));
             	
                 return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"The Registration has been created successfully. This is your ID: " + tenantInfo.getTenantId() + "\"}", Registrationresponse.class), HttpStatus.CREATED);
             } catch (IOException e) {
@@ -182,24 +179,4 @@ public class RegistrationApiController implements RegistrationApi {
         log.info("registrationPOST() exited");
         return new ResponseEntity<Registrationresponse>(HttpStatus.BAD_REQUEST);
     }
-    
-    
-    private MimeMessagePreparator prepareEmail(Integer tenantId, String toEmail, String verificationCode) {
-    	String htmlMsg = "<h2>To confirm your account, please click " + "<a href=http://localhost:8080/ptms/registration/" + tenantId + "/emailverification?code=" + verificationCode + ">here</a></h2>";
-        
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
-
-            public void prepare(MimeMessage mimeMessage) throws Exception {
-            	mimeMessage.setSubject("PTMS - Registration Verification");
-                mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-                mimeMessage.setFrom(new InternetAddress("donotreply.proarchs@gmail.com"));
-                mimeMessage.addHeader("Content-Type", "application/json");
-                mimeMessage.setContent(htmlMsg, "text/html");
-            }
-        };
-        
-        return preparator;
-    	
-    }
-
 }
