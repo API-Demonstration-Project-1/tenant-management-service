@@ -7,16 +7,16 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.*;
 
 /**
- * Registrationresponse
+ * Loginresponse
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
 
-public class Registrationresponse   {
+public class Loginresponse   {
   @JsonProperty("message")
   private String message = null;
 
-  public Registrationresponse message(String message) {
+  public Loginresponse message(String message) {
     this.message = message;
     return this;
   }
@@ -46,8 +46,8 @@ public class Registrationresponse   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Registrationresponse registrationresponse = (Registrationresponse) o;
-    return Objects.equals(this.message, registrationresponse.message);
+    Loginresponse loginresponse = (Loginresponse) o;
+    return Objects.equals(this.message, loginresponse.message);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class Registrationresponse   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Registrationresponse {\n");
+    sb.append("class Loginresponse {\n");
     
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("}");

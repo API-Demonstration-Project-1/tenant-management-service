@@ -59,6 +59,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 		<!--SpringFox dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -151,6 +155,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-rsa</artifactId>
 		</dependency>
+		
+		<dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
 	</dependencies>
 
 	<dependencyManagement>

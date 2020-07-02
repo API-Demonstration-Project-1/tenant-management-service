@@ -16,4 +16,5 @@ public interface TenantRepository extends CrudRepository<TenantInfo, Integer> {
 	List<TenantInfo> findByTenantUsername(String tenantUsername);
 	List<TenantInfo> findByTenantEmail(String tenantEmail);
 	List<TenantInfo> findByTenantVerified(String tenantVerified);
+	List<TenantInfo> findByTenantVerificationCode(String tenantVerificationCode);
 }

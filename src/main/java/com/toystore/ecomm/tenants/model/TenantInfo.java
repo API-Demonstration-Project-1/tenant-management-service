@@ -4,14 +4,18 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -40,6 +44,9 @@ public class TenantInfo   {
 
   @Column(name = "TENANT_VERIFIED", nullable = false)
   private String tenantVerified = null;
+  
+  @Column(name = "TENANT_VERIFICATIONCODE", nullable = false)
+  private String tenantVerificationCode = null;
 
   @Column(name = "CREATED_TS", nullable = false)
   private Timestamp createdTS = null;
@@ -52,6 +59,9 @@ public class TenantInfo   {
   
   @OneToMany(mappedBy = "tenant")
   private List<SubscriptionInfo> subscriptionInfoList;
+  
+  @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private TenantDBInfo tenantDBInfo;
   
   public Integer getTenantId() {
 	return tenantId;
@@ -142,7 +152,7 @@ public TenantInfo tenantName(String tenantName) {
   }
 
   public void setTenantPassword(String tenantPassword) {
-    this.tenantPassword = tenantPassword;
+    this.tenantPassword = BCrypt.hashpw(tenantPassword, BCrypt.gensalt());
   }
 
   public TenantInfo tenantVerified(String tenantVerified) {
@@ -166,7 +176,15 @@ public TenantInfo tenantName(String tenantName) {
     this.tenantVerified = tenantVerified;
   }
 
-  public Timestamp getCreatedTS() {
+  public String getTenantVerificationCode() {
+	return tenantVerificationCode;
+}
+
+public void setTenantVerificationCode(String tenantVerificationCode) {
+	this.tenantVerificationCode = tenantVerificationCode;
+}
+
+public Timestamp getCreatedTS() {
 	return createdTS;
 }
 
@@ -188,6 +206,14 @@ public String getCreatedBy() {
 
 public void setCreatedBy(String createdBy) {
 	this.createdBy = createdBy;
+}
+
+public TenantDBInfo getTenantDBInfo() {
+	return tenantDBInfo;
+}
+
+public void setTenantDBInfo(TenantDBInfo tenantDBInfo) {
+	this.tenantDBInfo = tenantDBInfo;
 }
 
 public TenantInfo withId(Integer id){
@@ -221,7 +247,7 @@ public TenantInfo withId(Integer id){
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Registration {\n");
+    //sb.append("class Registration {\n");
     
     sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
     sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");
