@@ -71,11 +71,15 @@ public class TenantService {
 	
 	public boolean isTenantRegistered(Integer tenantId, String code) {
 		
-		if (tenantRepository.findByTenantVerificationCode(code).size() > 0) {
-			return (((TenantInfo)(tenantRepository.findByTenantVerificationCode(code).get(0))).getTenantId()).equals(tenantId) ? true : false;
-		} else {
-			return false;
-		}
+		return (tenantRepository.findByTenantId(tenantId).get(0)).getTenantVerificationCode().equals(code) ? true : false;
+		
+		/*
+		 * if (tenantRepository.findByTenantVerificationCode(code).size() > 0) { return
+		 * (((TenantInfo)(tenantRepository.findByTenantVerificationCode(code).get(0))).
+		 * getTenantId()).equals(tenantId) ? true : false; } else { return false; }
+		 */
+		
+		
 	}
 	
 	public boolean isTenantVerified(Integer tenantId) {

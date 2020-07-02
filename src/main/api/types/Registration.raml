@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+
+properties:
+  tenantName:
+    description: This is unique name for each tenant
+    required: true
+    type: string
+  tenantEmail:
+    description: This is the email of the tenant
+    required: true
+    type: string
+  tenantUsername:
+    description: This is the Username for the login
+    required: true
+    type: string
+  tenantPassword:
+    description: This is the Password for the login
+    required: true
+    type: string
+  tenantVerified:
+    description: This indicates whether Tenant Registration is verified or not
+    required: false
+    type: string

@@ -2,43 +2,31 @@ package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * Error
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Error   {
-  @JsonProperty("code")
-  private Integer code = null;
-
   @JsonProperty("message")
   private String message = null;
 
-  public Error code(Integer code) {
-    this.code = code;
-    return this;
-  }
+  @JsonProperty("success")
+  private Boolean success = null;
 
-  /**
-   * This is the Error Code
-   * @return code
-  **/
-  @ApiModelProperty(required = true, value = "This is the Error Code")
-  @NotNull
+  @JsonProperty("data")
+  private Object data = null;
 
-
-  public Integer getCode() {
-    return code;
-  }
-
-  public void setCode(Integer code) {
-    this.code = code;
-  }
+  @JsonProperty("errorCode")
+  private Integer errorCode = null;
 
   public Error message(String message) {
     this.message = message;
@@ -46,10 +34,10 @@ public class Error   {
   }
 
   /**
-   * This is the Error Message
+   * This is the Verification-related message
    * @return message
   **/
-  @ApiModelProperty(required = true, value = "This is the Error Message")
+  @ApiModelProperty(required = true, value = "This is the Verification-related message")
   @NotNull
 
 
@@ -59,6 +47,67 @@ public class Error   {
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public Error success(Boolean success) {
+    this.success = success;
+    return this;
+  }
+
+  /**
+   * True or False
+   * @return success
+  **/
+  @ApiModelProperty(required = true, value = "True or False")
+  @NotNull
+
+
+  public Boolean isSuccess() {
+    return success;
+  }
+
+  public void setSuccess(Boolean success) {
+    this.success = success;
+  }
+
+  public Error data(Object data) {
+    this.data = data;
+    return this;
+  }
+
+  /**
+   * This is any data
+   * @return data
+  **/
+  @ApiModelProperty(value = "This is any data")
+
+
+  public Object getData() {
+    return data;
+  }
+
+  public void setData(Object data) {
+    this.data = data;
+  }
+
+  public Error errorCode(Integer errorCode) {
+    this.errorCode = errorCode;
+    return this;
+  }
+
+  /**
+   * This is gives error code info
+   * @return errorCode
+  **/
+  @ApiModelProperty(value = "This is gives error code info")
+
+
+  public Integer getErrorCode() {
+    return errorCode;
+  }
+
+  public void setErrorCode(Integer errorCode) {
+    this.errorCode = errorCode;
   }
 
 
@@ -71,13 +120,15 @@ public class Error   {
       return false;
     }
     Error error = (Error) o;
-    return Objects.equals(this.code, error.code) &&
-        Objects.equals(this.message, error.message);
+    return Objects.equals(this.message, error.message) &&
+        Objects.equals(this.success, error.success) &&
+        Objects.equals(this.data, error.data) &&
+        Objects.equals(this.errorCode, error.errorCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(code, message);
+    return Objects.hash(message, success, data, errorCode);
   }
 
   @Override
@@ -85,8 +136,10 @@ public class Error   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Error {\n");
     
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    success: ").append(toIndentedString(success)).append("\n");
+    sb.append("    data: ").append(toIndentedString(data)).append("\n");
+    sb.append("    errorCode: ").append(toIndentedString(errorCode)).append("\n");
     sb.append("}");
     return sb.toString();
   }

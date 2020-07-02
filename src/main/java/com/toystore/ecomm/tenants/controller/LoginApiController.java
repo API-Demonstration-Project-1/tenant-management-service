@@ -10,10 +10,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,11 +28,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,13 +108,33 @@ public class LoginApiController implements LoginApi {
 															);
 				}
 				
-				loadCurrentDatabaseInstance(tenantInfo.getTenantDBInfo().getTenantDBName(), tenantInfo.getTenantUsername());
+				/*
+				 * loadCurrentDatabaseInstance(tenantInfo.getTenantDBInfo().getTenantDBName(),
+				 * tenantInfo.getTenantUsername());
+				 * 
+				 * final Authentication authentication = authenticationManager.authenticate(new
+				 * UsernamePasswordAuthenticationToken(body.getUserName(),
+				 * body.getUserPassword()));
+				 * SecurityContextHolder.getContext().setAuthentication(authentication);
+				 * UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+				 */
+		        
+		        String authServerResp = invokeAuthServer(body.getUserName(), body.getUserPassword());
+		        System.out.println("Response from Auth Server: " + authServerResp);
+		        
+		        JSONObject obj = new JSONObject(authServerResp);
+		        String jwtToken = obj.getString("access_token");
+		        
 				
-				final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getUserName(), body.getUserPassword()));
-		        SecurityContextHolder.getContext().setAuthentication(authentication);
-		        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+				/*
+				 * return new ResponseEntity<Loginresponse>(objectMapper.
+				 * readValue("{ \"message\" : \"User with username - " +
+				 * userDetails.getUsername() + " successfully logged-in.\"}",
+				 * Loginresponse.class), HttpStatus.OK);
+				 */
 				
-				return new ResponseEntity<Loginresponse>(objectMapper.readValue("{ \"message\" : \"User with username - " + userDetails.getUsername() + " successfully logged-in.\"}",
+
+				return new ResponseEntity<Loginresponse>(objectMapper.readValue("{ \"jwttoken\": \"" + jwtToken + "\"}",
 														 Loginresponse.class),
 														 HttpStatus.OK);
 			} catch(AuthenticationException ae) {
@@ -140,8 +170,37 @@ public class LoginApiController implements LoginApi {
 		return new ResponseEntity<Login>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
-	private void loadCurrentDatabaseInstance(String databaseName, String userName) {
-        DBContextHolder.setCurrentDb(databaseName);
-        mapValue.put(userName, databaseName);
-    }
+	
+	private String invokeAuthServer(String userName, String password) {
+		String result = null;
+		
+		String url = "http://localhost:8901/auth/oauth/token";
+		
+	    // create auth credentials
+	    String authStr = "eagleeye:thisissecret";
+	    String base64Creds = Base64.getEncoder().encodeToString(authStr.getBytes());
+
+	    // create headers
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Authorization", "Basic " + base64Creds);
+	    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+	    
+	    LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+	    map.add("grant_type", "password");
+	    map.add("scope", "webclient");
+	    map.add("username", userName);
+	    map.add("password", password);
+	    
+	    HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+	    
+	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+	    HttpStatus statusCode = responseEntity.getStatusCode();
+	    
+	    if (statusCode == HttpStatus.OK) {
+	        result = responseEntity.getBody();
+	    }
+	    
+	    return result;
+	}
 }

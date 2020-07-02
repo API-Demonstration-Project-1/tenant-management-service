@@ -1,16 +1,20 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.validation.annotation.Validated;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Registration
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Registration   {
   @JsonProperty("tenantName")
@@ -122,6 +126,7 @@ public class Registration   {
    * @return tenantVerified
   **/
   @ApiModelProperty(required = false, value = "This indicates whether Tenant Registration is verified or not")
+
 
   public String getTenantVerified() {
     return tenantVerified;

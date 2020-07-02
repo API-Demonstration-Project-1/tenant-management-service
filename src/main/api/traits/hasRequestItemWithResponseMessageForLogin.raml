@@ -1,0 +1,20 @@
+#%RAML 1.0 Trait
+
+usage: Use this trait for resources whose request body is a single item & on successful submission returns sucess message
+
+body:
+  application/json:
+    type: <<resourcePathName|!uppercamelcase|!singularize>>
+responses:
+  201:
+    body:
+      application/json:
+        example: |
+          {
+            "success": true,
+            "message": "User logged in successfully",
+            "data": {
+                      "jwttoken": "abdcd"
+                    },
+            "error_code": 401
+          }

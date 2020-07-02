@@ -1,0 +1,79 @@
+#%RAML 1.0
+
+title: Tenant Management API
+version: v1
+baseUri: http://www.proarchs.com/ptms
+
+types:
+  Registration: !include types/Registration.raml
+  Login: !include types/Login.raml
+  Subscription: !include types/Subscription.raml
+  Error: !include types/Error.raml
+
+resourceTypes:
+  collection: !include resourceTypes/collection.raml
+  collection-item: !include resourceTypes/collection-item.raml
+
+traits:
+  hasRequestItem: !include traits/hasRequestItem.raml
+  hasRequestItemWithResponseMessage: !include traits/hasRequestItemWithResponseMessage.raml
+  hasRequestItemWithResponseMessageForLogin: !include ./traits/hasRequestItemWithResponseMessageForLogin.raml
+  hasResponseItem: !include traits/hasResponseItem.raml
+  hasResponseCollection: !include traits/hasResponseCollection.raml
+  hasNotFound: !include traits/hasNotFound.raml
+  hasBadRequest: !include traits/hasBadRequest.raml
+  hasForbidden: !include traits/hasForbidden.raml
+  hasUnauthorized: !include traits/hasUnauthorized.raml
+
+/registration:
+  type: collection
+
+  get:
+    queryParameters:
+      tenantName:
+        description: Get List of Tenant Info based on a given Tenant Name
+        required: false
+        type: string
+      tenantEmail:
+        description: Get List of Tenant Info based on a given Tenant Email
+        required: false
+        type: string
+      tenantVerified:
+        description: Get List of Tenant Info based on Verified or Not Verified
+        required: false
+        type: string
+
+  /{tenantId}:
+    type: collection-item
+
+    /emailverification:
+      get:
+        queryParameters:
+          code:
+            description: This is the Verification Code for this tenant
+            required: true
+            type: string
+
+/login:
+  type: collection-item
+
+/subscription:
+  type: collection
+
+  get:
+    queryParameters:
+      tenantName:
+        description: Get Subscriptions for a given Tenant Name
+        required: false
+        type: string
+      planName:
+        description: Get Subscriptions for a given Plan Name
+        required: false
+        type: string
+      isValid:
+        description: Get all Valid or Invalid Subscriptions
+        required: false
+        type: string
+
+  /{subscriptionId}:
+    type: collection-item

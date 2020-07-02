@@ -1,7 +1,9 @@
 package com.toystore.ecomm.tenants.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +45,18 @@ public class SubscriptionService {
 	}
 	
 	public List<SubscriptionInfo> getSubscriptionsByTenantName(String tenantName) {
-		TenantInfo tenantInfo = (tenantRepository.findByTenantName(tenantName)).get(0);
-		return subscriptionRepository.findByTenantId(tenantInfo.getTenantId());
+		ListIterator<TenantInfo> tenantInfoListIter = tenantRepository.findByTenantName(tenantName).listIterator();
+		List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>();
+		
+		while (tenantInfoListIter.hasNext()) {
+			TenantInfo tenantInfo = tenantInfoListIter.next();
+			
+			if (subscriptionRepository.findByTenantId(tenantInfo.getTenantId()).size() > 0) {
+				subscriptionInfoList.addAll(subscriptionRepository.findByTenantId(tenantInfo.getTenantId()));
+			}
+		}
+		
+		return subscriptionInfoList;
 	}
 	
 	public List<SubscriptionInfo> getSubscriptionsByPlanName(String planName) {

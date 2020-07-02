@@ -11,7 +11,7 @@ public class EmailNotificationPreparator {
 	 public static MimeMessagePreparator prepareEmailForTenantVerification(Integer tenantId, String toEmail, String verificationCode) {
 	    	String htmlMsg = "<h1><center>PTMS - Registration Verification</center></h1><br>"
 	    					 + 
-	    					 "<h2>To confirm your account, please click " + "<a href=http://localhost:8080/ptms/registration/" + tenantId + "/emailverification?code=" + verificationCode + ">here</a></h2>";
+	    					 "<h2>To confirm your account, please click " + "<a href=https://localhost:8080/ptms/registration/" + tenantId + "/emailverification?code=" + verificationCode + ">here</a></h2>";
 	        
 	        MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
@@ -54,7 +54,7 @@ public class EmailNotificationPreparator {
 	        MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
 	            public void prepare(MimeMessage mimeMessage) throws Exception {
-	            	mimeMessage.setSubject("Welcome to PTMS");
+	            	mimeMessage.setSubject("PTMS - Registration Verification Confirmation");
 	                mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
 	                mimeMessage.setFrom(new InternetAddress("donotreply.proarchs@gmail.com"));
 	                mimeMessage.addHeader("Content-Type", "application/json");

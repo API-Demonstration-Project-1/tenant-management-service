@@ -1,23 +1,22 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.toystore.ecomm.tenants.model.Data2;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
- * Loginresponse
+ * Registrationresponse1
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
-public class Loginresponse   {
+public class Registrationresponse1   {
   @JsonProperty("success")
   private Boolean success = null;
 
@@ -30,7 +29,7 @@ public class Loginresponse   {
   @JsonProperty("error_code")
   private Integer errorCode = null;
 
-  public Loginresponse success(Boolean success) {
+  public Registrationresponse1 success(Boolean success) {
     this.success = success;
     return this;
   }
@@ -51,7 +50,7 @@ public class Loginresponse   {
     this.success = success;
   }
 
-  public Loginresponse message(String message) {
+  public Registrationresponse1 message(String message) {
     this.message = message;
     return this;
   }
@@ -72,7 +71,7 @@ public class Loginresponse   {
     this.message = message;
   }
 
-  public Loginresponse data(Data2 data) {
+  public Registrationresponse1 data(Data2 data) {
     this.data = data;
     return this;
   }
@@ -94,7 +93,7 @@ public class Loginresponse   {
     this.data = data;
   }
 
-  public Loginresponse errorCode(Integer errorCode) {
+  public Registrationresponse1 errorCode(Integer errorCode) {
     this.errorCode = errorCode;
     return this;
   }
@@ -124,11 +123,11 @@ public class Loginresponse   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Loginresponse loginresponse = (Loginresponse) o;
-    return Objects.equals(this.success, loginresponse.success) &&
-        Objects.equals(this.message, loginresponse.message) &&
-        Objects.equals(this.data, loginresponse.data) &&
-        Objects.equals(this.errorCode, loginresponse.errorCode);
+    Registrationresponse1 registrationresponse1 = (Registrationresponse1) o;
+    return Objects.equals(this.success, registrationresponse1.success) &&
+        Objects.equals(this.message, registrationresponse1.message) &&
+        Objects.equals(this.data, registrationresponse1.data) &&
+        Objects.equals(this.errorCode, registrationresponse1.errorCode);
   }
 
   @Override
@@ -139,7 +138,7 @@ public class Loginresponse   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Loginresponse {\n");
+    sb.append("class Registrationresponse1 {\n");
     
     sb.append("    success: ").append(toIndentedString(success)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");

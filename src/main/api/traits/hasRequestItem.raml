@@ -1,0 +1,8 @@
+#%RAML 1.0 Trait
+
+usage: Use this trait for resources whose request body is a single
+
+body:
+  application/json:
+    type:  <<resourcePathName|!uppercamelcase|!singularize>>
+    #example: !include ../examples/<<typeName>>.json
