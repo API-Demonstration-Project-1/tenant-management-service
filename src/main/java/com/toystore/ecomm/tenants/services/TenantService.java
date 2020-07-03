@@ -61,6 +61,10 @@ public class TenantService {
 		return tenantRepository.save(existingTenantInfo);
 	}
 	
+	public boolean isTenantExisting(Integer tenantId) {
+		return ((tenantRepository.findByTenantId(tenantId)).size() == 0 ? false : true);
+	}
+	
 	public boolean isTenantUsernameUnique(String tenantUsername) {
 		return ((tenantRepository.findByTenantUsername(tenantUsername).size()) > 0) ? false : true;
 	}
@@ -71,19 +75,15 @@ public class TenantService {
 	
 	public boolean isTenantRegistered(Integer tenantId, String code) {
 		
-		return (tenantRepository.findByTenantId(tenantId).get(0)).getTenantVerificationCode().equals(code) ? true : false;
+		List<TenantInfo> tenantInfoList = null;
 		
-		/*
-		 * if (tenantRepository.findByTenantVerificationCode(code).size() > 0) { return
-		 * (((TenantInfo)(tenantRepository.findByTenantVerificationCode(code).get(0))).
-		 * getTenantId()).equals(tenantId) ? true : false; } else { return false; }
-		 */
-		
-		
+		return ((tenantInfoList = tenantRepository.findByTenantId(tenantId)).size() == 0 ? false : (((tenantInfoList.get(0)).getTenantVerificationCode()).equals(code) ? true : false));
 	}
 	
 	public boolean isTenantVerified(Integer tenantId) {
-		return (((tenantRepository.findByTenantId(tenantId)).get(0)).getTenantVerified()).equals(PTMSConstants.YES_VALUE) ? true : false;
+		List<TenantInfo> tenantInfoList = null;
+		
+		return ((tenantInfoList = tenantRepository.findByTenantId(tenantId)).size() == 0 ? false : (((tenantInfoList.get(0)).getTenantVerified()).equals(PTMSConstants.YES_VALUE) ? true : false));
 	}
 	
 	public TenantInfo getTenantInfoByUsername(String tenantUsername) {
