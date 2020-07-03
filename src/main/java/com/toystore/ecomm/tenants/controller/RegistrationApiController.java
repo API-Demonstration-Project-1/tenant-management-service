@@ -113,7 +113,7 @@ public class RegistrationApiController implements RegistrationApi {
 		    	} else {
 		    		log.info("registrationEmailverificationByTenantIdGET() exited");
 		    		
-		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Verification Code is not correct. Please make sure your Verification Code is correct\"}", Registrationresponse.class), HttpStatus.OK);
+		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Verification Code is not correct. Please make sure your Verification Code is correct\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
 		    	}
     		} else {
     			log.info("registrationEmailverificationByTenantIdGET() exited");
@@ -174,7 +174,7 @@ public class RegistrationApiController implements RegistrationApi {
             	
             	
             	// Prepare Response
-            	Registrationresponse registrationResponse = prepareRegistrationResponse(tenantInfo);
+            	Registrationresponse registrationResponse = prepareRegistrationResponse(tenantInfo.getTenantId(), "The Registration has been created successfully", true, null);
             	
                 return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
             } catch (IOException e) {
@@ -187,16 +187,17 @@ public class RegistrationApiController implements RegistrationApi {
         return new ResponseEntity<Registrationresponse>(HttpStatus.BAD_REQUEST);
     }
 
-	private Registrationresponse prepareRegistrationResponse(TenantInfo tenantInfo) {
+	private Registrationresponse prepareRegistrationResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) {
 		Data data = new Data();
-		data.setId(tenantInfo.getTenantId());
+		data.setId((Integer)dataInfo);
 		
 		Registrationresponse registrationResponse = new Registrationresponse();
 		
 		registrationResponse.setData(data);
-		registrationResponse.setErrorCode(null);
-		registrationResponse.setMessage("The Registration has been created successfully");
-		registrationResponse.setSuccess(true);
+		registrationResponse.setErrorCode(errorCode);
+		registrationResponse.setMessage(msg);
+		//registrationResponse.setMessage("The Registration has been created successfully");
+		registrationResponse.setSuccess(isSuccess);
 		return registrationResponse;
 	}
 }
