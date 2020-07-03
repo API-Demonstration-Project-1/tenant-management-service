@@ -1,0 +1,751 @@
+swagger: '2.0'
+info:
+  version: 'v1'
+  title: Tenant Management API
+  contact: {}
+host: www.proarchs.com
+basePath: /ptms
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /registration:
+    get:
+      description: Get a list of Registration
+      summary: Registration_GET
+      tags:
+      - registration
+      operationId: Registration_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantName
+        in: query
+        required: false
+        type: string
+        description: Get List of Tenant Info based on a given Tenant Name
+      - name: tenantEmail
+        in: query
+        required: false
+        type: string
+        description: Get List of Tenant Info based on a given Tenant Email
+      - name: tenantVerified
+        in: query
+        required: false
+        type: string
+        description: Get List of Tenant Info based on Verified or Not Verified
+      responses:
+        200:
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Registration'
+          headers: {}
+    post:
+      description: Add a new Registration
+      summary: Registration_POST
+      tags:
+      - registration
+      operationId: Registration_POST
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Registration'
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/Registrationresponse'
+          examples:
+            application/json:
+              success: true
+              message: The Registration has been created successfully
+              data:
+                id: 123
+              error_code: 400
+          headers: {}
+  /registration/{tenantId}:
+    post:
+      description: Registration using Username & Password
+      summary: RegistrationByTenantId_POST
+      tags:
+      - registration
+      operationId: RegistrationByTenantId_POST
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Registration'
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/Registrationresponse1'
+          examples:
+            application/json:
+              success: true
+              message: User logged in successfully
+              data:
+                jwttoken: abdcd
+              error_code: 401
+          headers: {}
+        400:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+              success: false
+              message: Bad Request
+              data:
+                errorDesc: Bad Request
+              error_code: 400
+    get:
+      description: Get a Registration by registrationId
+      summary: RegistrationByTenantId_GET
+      tags:
+      - registration
+      operationId: RegistrationByTenantId_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Registration'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update a Registration by registrationId
+      summary: RegistrationByTenantId_PUT
+      tags:
+      - registration
+      operationId: RegistrationByTenantId_PUT
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Registration'
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Registration'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Delete a Registration by registrationId
+      summary: RegistrationByTenantId_DELETE
+      tags:
+      - registration
+      operationId: RegistrationByTenantId_DELETE
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        204:
+          description: ''
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+  /registration/{tenantId}/emailverification:
+    get:
+      summary: RegistrationEmailverificationByTenantId_GET
+      tags:
+      - registration
+      operationId: RegistrationEmailverificationByTenantId_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: code
+        in: query
+        required: true
+        type: string
+        description: This is the Verification Code for this tenant
+      responses:
+        200:
+          description: ''
+          headers: {}
+  /login:
+    post:
+      description: Login using Username & Password
+      summary: Login_POST
+      tags:
+      - login
+      operationId: Login_POST
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Login'
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/Loginresponse'
+          examples:
+            application/json:
+              success: true
+              message: User logged in successfully
+              data:
+                jwttoken: abdcd
+              error_code: 401
+          headers: {}
+        400:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+              success: false
+              message: Bad Request
+              data:
+                errorDesc: Bad Request
+              error_code: 400
+    get:
+      description: Get a Login by loginId
+      summary: Login_GET
+      tags:
+      - login
+      operationId: Login_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Login'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update a Login by loginId
+      summary: Login_PUT
+      tags:
+      - login
+      operationId: Login_PUT
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Login'
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Login'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Delete a Login by loginId
+      summary: Login_DELETE
+      tags:
+      - login
+      operationId: Login_DELETE
+      deprecated: false
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        204:
+          description: ''
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+  /subscription:
+    get:
+      description: Get a list of Subscription
+      summary: Subscription_GET
+      tags:
+      - subscription
+      operationId: Subscription_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: tenantName
+        in: query
+        required: false
+        type: string
+        description: Get Subscriptions for a given Tenant Name
+      - name: planName
+        in: query
+        required: false
+        type: string
+        description: Get Subscriptions for a given Plan Name
+      - name: isValid
+        in: query
+        required: false
+        type: string
+        description: Get all Valid or Invalid Subscriptions
+      responses:
+        200:
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Subscription'
+          headers: {}
+    post:
+      description: Add a new Subscription
+      summary: Subscription_POST
+      tags:
+      - subscription
+      operationId: Subscription_POST
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Subscription'
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/Subscriptionresponse'
+          examples:
+            application/json:
+              success: true
+              message: The Subscription has been created successfully
+              data:
+                id: 123
+              error_code: 400
+          headers: {}
+  /subscription/{subscriptionId}:
+    post:
+      description: Subscription using Username & Password
+      summary: SubscriptionBySubscriptionId_POST
+      tags:
+      - subscription
+      operationId: SubscriptionBySubscriptionId_POST
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Subscription'
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/Subscriptionresponse1'
+          examples:
+            application/json:
+              success: true
+              message: User logged in successfully
+              data:
+                jwttoken: abdcd
+              error_code: 401
+          headers: {}
+        400:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+              success: false
+              message: Bad Request
+              data:
+                errorDesc: Bad Request
+              error_code: 400
+    get:
+      description: Get a Subscription by subscriptionId
+      summary: SubscriptionBySubscriptionId_GET
+      tags:
+      - subscription
+      operationId: SubscriptionBySubscriptionId_GET
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Subscription'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      description: Update a Subscription by subscriptionId
+      summary: SubscriptionBySubscriptionId_PUT
+      tags:
+      - subscription
+      operationId: SubscriptionBySubscriptionId_PUT
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/Subscription'
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/Subscription'
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: Delete a Subscription by subscriptionId
+      summary: SubscriptionBySubscriptionId_DELETE
+      tags:
+      - subscription
+      operationId: SubscriptionBySubscriptionId_DELETE
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        204:
+          description: ''
+          headers: {}
+        404:
+          description: 'TODO: Add error message'
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Registration:
+    title: Registration
+    type: object
+    properties:
+      tenantName:
+        description: This is unique name for each tenant
+        type: string
+      tenantEmail:
+        description: This is the email of the tenant
+        type: string
+      tenantUsername:
+        description: This is the Username for the login
+        type: string
+      tenantPassword:
+        description: This is the Password for the login
+        type: string
+      tenantVerified:
+        description: This indicates whether Tenant Registration is verified or not
+        type: string
+    required:
+    - tenantName
+    - tenantEmail
+    - tenantUsername
+    - tenantPassword
+    - tenantVerified
+  Login:
+    title: Login
+    type: object
+    properties:
+      userName:
+        description: This is the Login User Name
+        type: string
+      userPassword:
+        description: This is the Login User Password
+        type: string
+    required:
+    - userName
+    - userPassword
+  Subscription:
+    title: Subscription
+    type: object
+    properties:
+      planName:
+        description: This is the Plan Name
+        type: string
+      renewalType:
+        description: This is the Renewal Type
+        type: string
+      startDate:
+        description: This indicates the Start Date of Subscription
+        type: string
+      endDate:
+        description: This indicates the End Date of Subscription
+        type: string
+      isValid:
+        description: This indicates whether the Current Subscription is Valid or Not
+        type: string
+    required:
+    - planName
+    - renewalType
+    - startDate
+    - endDate
+    - isValid
+  Error:
+    title: Error
+    type: object
+    properties:
+      message:
+        description: This is the Verification-related message
+        type: string
+      success:
+        description: True or False
+        type: boolean
+      data:
+        description: This is any data
+        type: object
+      errorCode:
+        description: This is gives error code info
+        type: integer
+        format: int32
+    required:
+    - message
+    - success
+  Data:
+    title: Data
+    example:
+      id: 123
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+    required:
+    - id
+  Data2:
+    title: Data2
+    example:
+      jwttoken: abdcd
+    type: object
+    properties:
+      jwttoken:
+        type: string
+    required:
+    - jwttoken
+  Loginresponse:
+    title: Loginresponse
+    example:
+      success: true
+      message: User logged in successfully
+      data:
+        jwttoken: abdcd
+      error_code: 401
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        $ref: '#/definitions/Data2'
+      error_code:
+        type: integer
+        format: int32
+    required:
+    - success
+    - message
+    - data
+    - error_code
+  Registrationresponse:
+    title: Registrationresponse
+    example:
+      success: true
+      message: The Registration has been created successfully
+      data:
+        id: 123
+      error_code: 400
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        $ref: '#/definitions/Data'
+      error_code:
+        type: integer
+        format: int32
+    required:
+    - success
+    - message
+    - data
+    - error_code
+  Registrationresponse1:
+    title: Registrationresponse1
+    example:
+      success: true
+      message: User logged in successfully
+      data:
+        jwttoken: abdcd
+      error_code: 401
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        $ref: '#/definitions/Data2'
+      error_code:
+        type: integer
+        format: int32
+    required:
+    - success
+    - message
+    - data
+    - error_code
+  Subscriptionresponse:
+    title: Subscriptionresponse
+    example:
+      success: true
+      message: The Subscription has been created successfully
+      data:
+        id: 123
+      error_code: 400
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        $ref: '#/definitions/Data'
+      error_code:
+        type: integer
+        format: int32
+    required:
+    - success
+    - message
+    - data
+    - error_code
+  Subscriptionresponse1:
+    title: Subscriptionresponse1
+    example:
+      success: true
+      message: User logged in successfully
+      data:
+        jwttoken: abdcd
+      error_code: 401
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        $ref: '#/definitions/Data2'
+      error_code:
+        type: integer
+        format: int32
+    required:
+    - success
+    - message
+    - data
+    - error_code
+tags:
+- name: registration
+  description: ''
+- name: login
+  description: ''
+- name: subscription
+  description: ''

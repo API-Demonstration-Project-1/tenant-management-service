@@ -1,0 +1,22 @@
+#%RAML 1.0 ResourceType
+
+usage: Use this resourceType to represent any single item
+description: Entity representing a <<resourcePathName|!uppercamelcase|!singularize>>
+
+post:
+  description: <<resourcePathName|!uppercamelcase|!singularize>> using Username & Password
+  is: [ hasRequestItem, hasRequestItemWithResponseMessageForLogin, hasBadRequest, hasUnauthorized, hasForbidden ]
+
+get:
+  description: Get a <<resourcePathName|!uppercamelcase|!singularize>> by <<resourcePathName|!singularize>>Id
+  is: [ hasResponseItem, hasNotFound ]
+
+put:
+  description: Update a <<resourcePathName|!uppercamelcase|!singularize>> by <<resourcePathName|!singularize>>Id
+  is: [ hasRequestItem, hasResponseItem, hasNotFound ]
+
+delete:
+  description: Delete a <<resourcePathName|!uppercamelcase|!singularize>> by <<resourcePathName|!singularize>>Id
+  is: [ hasNotFound ]
+  responses:
+    204:

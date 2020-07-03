@@ -1,5 +1,7 @@
 package com.toystore.ecomm.tenants.controller;
 
+import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.model.Data;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
@@ -111,7 +113,7 @@ public class RegistrationApiController implements RegistrationApi {
 		    	} else {
 		    		log.info("registrationEmailverificationByTenantIdGET() exited");
 		    		
-		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Verification Code is not correct. Please make sure your Verification Code is correct\"}", Registrationresponse.class), HttpStatus.OK);
+		    		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"Your Verification Code is not correct. Please make sure your Verification Code is correct\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
 		    	}
     		} else {
     			log.info("registrationEmailverificationByTenantIdGET() exited");
@@ -129,7 +131,7 @@ public class RegistrationApiController implements RegistrationApi {
     public ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
-            try {
+            try {	
                 return new ResponseEntity<List<Registration>>(objectMapper.readValue("[ {  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"}, {  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -146,6 +148,7 @@ public class RegistrationApiController implements RegistrationApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+            	
             	
             	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername()))
             		return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \""+ body.getTenantUsername()  + " Already Exists!!!\"}", Registrationresponse.class), HttpStatus.BAD_REQUEST);
@@ -169,7 +172,11 @@ public class RegistrationApiController implements RegistrationApi {
             	//Email for Registration Verification
             	emailService.sendNotification(EmailNotificationPreparator.prepareEmailForTenantVerification(tenantInfo.getTenantId(), tenantInfo.getTenantEmail(), tenantInfo.getTenantVerificationCode()));
             	
-                return new ResponseEntity<Registrationresponse>(objectMapper.readValue("{  \"message\" : \"The Registration has been created successfully. This is your ID: " + tenantInfo.getTenantId() + "\"}", Registrationresponse.class), HttpStatus.CREATED);
+            	
+            	// Prepare Response
+            	Registrationresponse registrationResponse = prepareRegistrationResponse(tenantInfo.getTenantId(), "The Registration has been created successfully", true, null);
+            	
+                return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Registrationresponse>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -179,4 +186,18 @@ public class RegistrationApiController implements RegistrationApi {
         log.info("registrationPOST() exited");
         return new ResponseEntity<Registrationresponse>(HttpStatus.BAD_REQUEST);
     }
+
+	private Registrationresponse prepareRegistrationResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) {
+		Data data = new Data();
+		data.setId((Integer)dataInfo);
+		
+		Registrationresponse registrationResponse = new Registrationresponse();
+		
+		registrationResponse.setData(data);
+		registrationResponse.setErrorCode(errorCode);
+		registrationResponse.setMessage(msg);
+		//registrationResponse.setMessage("The Registration has been created successfully");
+		registrationResponse.setSuccess(isSuccess);
+		return registrationResponse;
+	}
 }

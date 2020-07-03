@@ -2,15 +2,18 @@ package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * Subscription
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Subscription   {
   @JsonProperty("planName")
@@ -72,7 +75,7 @@ public void setTenantName(String tenantName) {
 	this.tenantName = tenantName;
 }
 
-public Subscription renewalType(String renewalType) {
+  public Subscription renewalType(String renewalType) {
     this.renewalType = renewalType;
     return this;
   }
