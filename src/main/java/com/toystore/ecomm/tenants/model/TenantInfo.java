@@ -57,7 +57,7 @@ public class TenantInfo   {
   @Column(name = "CREATED_BY", nullable = false)
   private String createdBy = null;
   
-  @OneToMany(mappedBy = "tenant")
+  @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<SubscriptionInfo> subscriptionInfoList;
   
   @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)

@@ -1,9 +1,16 @@
 package com.toystore.ecomm.tenants.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Data;
 import com.toystore.ecomm.tenants.model.Data2;
 import com.toystore.ecomm.tenants.model.Loginresponse;
+import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
+import com.toystore.ecomm.tenants.model.TenantInfo;
 
 public class ResponsePreparator {
 	
@@ -11,7 +18,7 @@ public class ResponsePreparator {
 		Data2 data = null;
 		if (dataInfo != null) {
 			data = new Data2();
-			data.setJwttoken(dataInfo.toString());;
+			data.setJwttoken(dataInfo.toString());
 		}
 		
 		Loginresponse loginResponse = new Loginresponse();
@@ -39,4 +46,24 @@ public class ResponsePreparator {
 		return registrationResponse;
 	}
 
+	public static List<Registration> prepareGETRegistrationResponse(List<TenantInfo> tenantInfoList) {
+		ListIterator<TenantInfo> tenantInfoListIter = tenantInfoList.listIterator();
+		List<Registration> regList = new ArrayList<Registration>();
+		
+		while(tenantInfoListIter.hasNext()) {
+			TenantInfo currentItem = tenantInfoListIter.next();
+			
+			Registration regObj = new Registration();
+			regObj.setTenantId(currentItem.getTenantId().toString());
+			regObj.setTenantName(currentItem.getTenantName());
+			regObj.setTenantUsername(currentItem.getTenantUsername());
+			regObj.setTenantPassword(PTMSConstants.PASSWORD_FIELD_VALUE);
+			regObj.setTenantEmail(currentItem.getTenantEmail());
+			regObj.setTenantVerified(currentItem.getTenantVerified());
+			
+			regList.add(regObj);
+		}
+		
+		return regList;
+	}
 }

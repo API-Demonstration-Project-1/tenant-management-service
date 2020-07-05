@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,10 +40,11 @@ public class LoginApiController implements LoginApi {
 
 	private final HttpServletRequest request;
 	
+	@Value("${service.auth.jwttype.url}")
+	private String authSrvcUrl;
 	
-	 @Autowired
-	 TenantService tenantService;
-	 
+	@Autowired
+	private TenantService tenantService;
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public LoginApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -97,8 +99,16 @@ public class LoginApiController implements LoginApi {
 					
 					return new ResponseEntity<Loginresponse>(resp, HttpStatus.BAD_REQUEST);
 				}
+				
+				if (tenantInfo.getTenantVerified().equalsIgnoreCase(PTMSConstants.NO_VALUE)) {
+					log.error("loginPOST() - Registration is Not Verified!!");
+					
+					Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Tenant's Registration is not Verified yet", false, -1);
+					
+					return new ResponseEntity<Loginresponse>(resp, HttpStatus.FORBIDDEN);
+				}
 		        
-				ResponseEntity<String> authServerResp = ServiceInvoker.invokeAuthServer(body.getUserName(), body.getUserPassword());
+				ResponseEntity<String> authServerResp = ServiceInvoker.invokeAuthServer(authSrvcUrl, body.getUserName(), body.getUserPassword());
 				String respStr = authServerResp.getBody();
 				HttpStatus httpStatus = authServerResp.getStatusCode();
 				

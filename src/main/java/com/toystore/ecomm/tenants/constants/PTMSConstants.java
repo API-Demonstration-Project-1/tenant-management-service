@@ -12,4 +12,6 @@ public class PTMSConstants {
 	
 	public static final String ACCESS_TOKEN_FIELD = "access_token";
 	public static final String ERROR_DESC_FIELD = "error_description";
+	
+	public static final String PASSWORD_FIELD_VALUE = "[PROTECTED]";
 }

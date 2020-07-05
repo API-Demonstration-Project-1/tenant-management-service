@@ -3,9 +3,7 @@ package com.toystore.ecomm.tenants.model;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
-import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Subscription
@@ -44,7 +44,7 @@ public class SubscriptionInfo {
 	@Column(name = "RENEWAL_TYPE_ID", nullable = false)
 	private Integer renewalTypeId = null;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "RENEWAL_TYPE_ID", referencedColumnName = "RENEWAL_TYPE_ID", insertable = false, updatable = false)
 	private RenewalTypeInfo renewalType;
 

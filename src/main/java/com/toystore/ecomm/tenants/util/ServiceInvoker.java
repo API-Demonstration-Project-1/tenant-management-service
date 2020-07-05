@@ -5,7 +5,6 @@ import java.util.Base64;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,7 +14,6 @@ import com.toystore.ecomm.tenants.constants.PTMSConstants;
 
 public class ServiceInvoker {
 	
-	private static final String AUTH_SRVC_URL = "http://localhost:8901/auth/oauth/token";
 	private static final String CLIENT_APP_USERNAME = "eagleeye";
 	private static final String CLIENT_APP_PASSWORD = "thisissecret";
 	private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -27,7 +25,7 @@ public class ServiceInvoker {
 	private static final String GRANT_TYPE_VALUE1 = "password";
 	private static final String SCOPE_VALUE1 = "webclient";
 	
-	public static ResponseEntity<String> invokeAuthServer(String userName, String password) {
+	public static ResponseEntity<String> invokeAuthServer(String url, String userName, String password) {
 		
 	    // Create Auth credentials
 	    String authStr = CLIENT_APP_USERNAME + PTMSConstants.COLON_SEPARATOR + CLIENT_APP_PASSWORD;
@@ -47,7 +45,7 @@ public class ServiceInvoker {
 	    
 	    HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
 	    
-	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(AUTH_SRVC_URL, HttpMethod.POST, requestEntity, String.class);
+	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
 
 	    return responseEntity;
 	}

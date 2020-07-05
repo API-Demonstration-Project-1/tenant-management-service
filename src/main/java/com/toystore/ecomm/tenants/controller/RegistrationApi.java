@@ -30,10 +30,9 @@ public interface RegistrationApi {
         @ApiResponse(code = 204, message = ""),
         @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
     @RequestMapping(value = "/registration/{tenantId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
+        produces = { "application/json" },
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> registrationByTenantIdDELETE(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
+    ResponseEntity<Registrationresponse> registrationByTenantIdDELETE(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
 
 
     @ApiOperation(value = "RegistrationByTenantId_GET", nickname = "registrationByTenantIdGET", notes = "Get a Registration by registrationId", response = Registration.class, tags={ "registration", })
@@ -41,21 +40,30 @@ public interface RegistrationApi {
         @ApiResponse(code = 200, message = "", response = Registration.class),
         @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
     @RequestMapping(value = "/registration/{tenantId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
+        produces = { "application/json" },
         method = RequestMethod.GET)
     ResponseEntity<Registration> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
 
 
-    @ApiOperation(value = "RegistrationByTenantId_POST", nickname = "registrationByTenantIdPOST", notes = "Registration using Username & Password", response = Registration.class, tags={ "registration", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "", response = Registration.class),
-        @ApiResponse(code = 400, message = "TODO: Add error message", response = Error.class) })
-    @RequestMapping(value = "/registration/{tenantId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
-        method = RequestMethod.POST)
-    ResponseEntity<Registration> registrationByTenantIdPOST(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
+	/*
+	 * @ApiOperation(value = "RegistrationByTenantId_POST", nickname =
+	 * "registrationByTenantIdPOST", notes =
+	 * "Registration using Username & Password", response = Registration.class,
+	 * tags={ "registration", })
+	 * 
+	 * @ApiResponses(value = {
+	 * 
+	 * @ApiResponse(code = 200, message = "", response = Registration.class),
+	 * 
+	 * @ApiResponse(code = 400, message = "TODO: Add error message", response =
+	 * Error.class) })
+	 * 
+	 * @RequestMapping(value = "/registration/{tenantId}", produces = {
+	 * "application/json" }, consumes = { "application/json" }, method =
+	 * RequestMethod.POST) ResponseEntity<Registration>
+	 * registrationByTenantIdPOST(@ApiParam(value =
+	 * "",required=true) @PathVariable("tenantId") String tenantId);
+	 */
 
 
     @ApiOperation(value = "RegistrationByTenantId_PUT", nickname = "registrationByTenantIdPUT", notes = "Update a Registration by registrationId", response = Registration.class, tags={ "registration", })
@@ -66,7 +74,7 @@ public interface RegistrationApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    ResponseEntity<Registration> registrationByTenantIdPUT(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body);
+    ResponseEntity<Registrationresponse> registrationByTenantIdPUT(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body);
 
 
     @ApiOperation(value = "RegistrationEmailverificationByTenantId_GET", nickname = "registrationEmailverificationByTenantIdGET", notes = "", response = Registrationresponse.class, tags={ "registration", })
@@ -82,8 +90,7 @@ public interface RegistrationApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "", response = Registration.class, responseContainer = "List") })
     @RequestMapping(value = "/registration",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
+        produces = { "application/json" },
         method = RequestMethod.GET)
     ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified);
 

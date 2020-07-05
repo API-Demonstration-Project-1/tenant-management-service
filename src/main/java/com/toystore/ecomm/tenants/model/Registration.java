@@ -17,6 +17,9 @@ import io.swagger.annotations.ApiModelProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Registration   {
+  @JsonProperty("tenantId")
+  private String tenantId = null;
+  
   @JsonProperty("tenantName")
   private String tenantName = null;
 
@@ -32,10 +35,20 @@ public class Registration   {
   @JsonProperty("tenantVerified")
   private String tenantVerified = null;
 
-  public Registration tenantName(String tenantName) {
-    this.tenantName = tenantName;
-    return this;
-  }
+  public String getTenantId() {
+	return tenantId;
+}
+
+  	@ApiModelProperty(required = false, value = "This is the ID of the Tenant")
+  	@NotNull
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
+	
+	public Registration tenantName(String tenantName) {
+	    this.tenantName = tenantName;
+	    return this;
+	}
 
   /**
    * This is unique name for each tenant
@@ -146,7 +159,8 @@ public class Registration   {
       return false;
     }
     Registration registration = (Registration) o;
-    return Objects.equals(this.tenantName, registration.tenantName) &&
+    return Objects.equals(this.tenantId, registration.tenantId) &&
+    	Objects.equals(this.tenantName, registration.tenantName) &&
         Objects.equals(this.tenantEmail, registration.tenantEmail) &&
         Objects.equals(this.tenantUsername, registration.tenantUsername) &&
         Objects.equals(this.tenantPassword, registration.tenantPassword) &&
@@ -163,6 +177,7 @@ public class Registration   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Registration {\n");
     
+    sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
     sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");
     sb.append("    tenantEmail: ").append(toIndentedString(tenantEmail)).append("\n");
     sb.append("    tenantUsername: ").append(toIndentedString(tenantUsername)).append("\n");
