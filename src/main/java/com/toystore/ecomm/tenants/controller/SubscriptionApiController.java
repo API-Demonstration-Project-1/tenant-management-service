@@ -1,13 +1,17 @@
 package com.toystore.ecomm.tenants.controller;
 
-import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.model.Subscription;
-import com.toystore.ecomm.tenants.model.SubscriptionInfo;
-import com.toystore.ecomm.tenants.model.Subscriptionresponse;
-import com.toystore.ecomm.tenants.model.TenantInfo;
-import com.toystore.ecomm.tenants.services.SubscriptionService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.*;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +22,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.model.Subscription;
+import com.toystore.ecomm.tenants.model.SubscriptionInfo;
+import com.toystore.ecomm.tenants.model.Subscriptionresponse;
+import com.toystore.ecomm.tenants.services.SubscriptionService;
+
+import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
 @Controller
@@ -49,7 +51,7 @@ public class SubscriptionApiController implements SubscriptionApi {
     }
 
     public ResponseEntity<Void> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) {
-        String accept = request.getHeader("Accept");
+        //String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -152,7 +154,7 @@ public class SubscriptionApiController implements SubscriptionApi {
                 subscriptionInfo.setTenantId(Integer.parseInt(body.getTenantName()));
                 subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
                 subscriptionInfo.setRenewalTypeId(Integer.parseInt(body.getRenewalType()));
-                subscriptionInfo.setIsValid("Y");
+                subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
                 subscriptionInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
                 subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
                 subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);

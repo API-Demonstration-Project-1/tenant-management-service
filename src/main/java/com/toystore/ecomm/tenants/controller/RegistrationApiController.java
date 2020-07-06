@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
@@ -37,10 +38,11 @@ public class RegistrationApiController implements RegistrationApi {
     private final HttpServletRequest request;
     
     @Autowired
-    TenantService tenantService;
+    private TenantService tenantService;
     
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
+    
 
     @org.springframework.beans.factory.annotation.Autowired
     public RegistrationApiController(HttpServletRequest request) {
@@ -216,7 +218,6 @@ public class RegistrationApiController implements RegistrationApi {
     }
     
     
-    // PARTIALLY DONE
     public ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
     	log.info("registrationGET() invoked");
     	
@@ -224,7 +225,40 @@ public class RegistrationApiController implements RegistrationApi {
         if (accept != null && accept.contains("application/json")) {
         	 try {
         		 List<TenantInfo> tenantInfoList = null;
-             	if (!((tenantInfoList = tenantService.getAllTenantInfo()).isEmpty())) {
+        		 
+        		if (tenantName == null) tenantName = PTMSConstants.BLANK_STRING;
+        		if (tenantEmail == null) tenantEmail = PTMSConstants.BLANK_STRING;
+        		if (tenantVerified == null) tenantVerified = PTMSConstants.BLANK_STRING;
+        		
+        		// Search by any one parameter
+        		if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByName(tenantName);
+        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByEmail(tenantEmail);
+        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByVerification(tenantVerified);
+        		}
+        		
+        		// Search by any 2 parameters
+        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByNameEmail(tenantName, tenantEmail);
+        		} else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByNameVerification(tenantName, tenantVerified);
+        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByEmailVerification(tenantEmail, tenantVerified);
+        		}
+        		
+        		// Search by all 3 parameters
+        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+        			tenantInfoList = tenantService.getTenantInfoByNameEmailVerification(tenantName, tenantEmail, tenantVerified);
+        		}
+        		
+        		// Search by none - Fetch All Tenants
+        		else {
+        			tenantInfoList = tenantService.getAllTenantInfo();
+        		}
+        		
+             	if (!tenantInfoList.isEmpty()) {
              		
              		return new ResponseEntity<List<Registration>>(ResponsePreparator.prepareGETRegistrationResponse(tenantInfoList), HttpStatus.OK);
              	} else {

@@ -6,16 +6,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.model.SubscriptionInfo;
+import com.toystore.ecomm.tenants.model.TenantDBInfo;
+import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.repository.TenantRepository;
 import com.toystore.ecomm.tenants.util.DBSchemaCreator;
 import com.toystore.ecomm.tenants.util.RandomStringGenerator;
-import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.model.TenantDBInfo;
-import com.toystore.ecomm.tenants.model.TenantInfo;
 
 @Service
 public class TenantService {
@@ -62,6 +65,7 @@ public class TenantService {
 		tenantRepository.save(existingTenantInfo);
 	}
 	
+	@Transactional
 	public TenantInfo updateTenantInfoPostVerification(Integer tenantId) throws Exception {
 		TenantInfo existingTenantInfo = tenantRepository.findByTenantId(tenantId);
 		
@@ -70,9 +74,30 @@ public class TenantService {
 		existingTenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
 		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
 		
+		// Create Community (Free) Subscription by default once Verification is confirmed
+		SubscriptionInfo subscriptionInfo = new SubscriptionInfo();
+        
+		subscriptionInfo.withId((new Random()).nextInt(1000));
+		subscriptionInfo.setStartDate(new Date());
+		subscriptionInfo.setEndDate(new Date());
+        subscriptionInfo.setTenantId(tenantId);
+        subscriptionInfo.setPlanTypeId(PTMSConstants.FREE_SUBSCRIPTION_TYPE);
+        subscriptionInfo.setRenewalTypeId(PTMSConstants.MONTHLY_RENEWAL_TYPE);
+        subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
+        subscriptionInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
+        subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
+        subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
+        
+        subscriptionInfo.setTenant(existingTenantInfo);
+        
+        List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>(1);
+		subscriptionInfoList.add(subscriptionInfo);
+        
 		DBSchemaCreator.createDbSchemaTable(driverName, dbUrl, dbUsername, dbPassword, existingTenantInfo.getTenantUsername());
 		
+		// Create DB-related Info once Verification is confirmed
 		TenantDBInfo tenantDBInfo = new TenantDBInfo();
+		
 		tenantDBInfo.withId((new Random()).nextInt(1000));
 		tenantDBInfo.setTenantId(tenantId);
 		tenantDBInfo.setTenantDBUrl(dbUrlPartial + existingTenantInfo.getTenantUsername() + "?useSSL=false");
@@ -83,6 +108,7 @@ public class TenantService {
 		tenantDBInfo.setTenantInfo(existingTenantInfo);
 		
 		existingTenantInfo.setTenantDBInfo(tenantDBInfo);
+		existingTenantInfo.setSubscriptionInfoList(subscriptionInfoList);
 		
 		return tenantRepository.save(existingTenantInfo);
 	}
@@ -118,8 +144,12 @@ public class TenantService {
 		return tenantInfoList.size() == 0 ? null : tenantInfoList.get(0);
 	}
 	
-	public void removeTenantInfo(Integer tenantId) {
+	public void removeTenantInfo(Integer tenantId) throws Exception {
+		String dbName = tenantRepository.findByTenantId(tenantId).getTenantUsername();
 		tenantRepository.deleteById(tenantId);
+		
+		// Drop the corresponding DB Schema as well
+		DBSchemaCreator.dropDbSchemaTable(driverName, dbUrl, dbUsername, dbPassword, dbName);
 	}
 	
 	public TenantInfo getTenantInfoByTenantId(Integer tenantId) {
@@ -132,5 +162,33 @@ public class TenantService {
 		(tenantRepository.findAll()).forEach(fetchedTenantList::add);
 		
 		return fetchedTenantList;
+	}
+	
+	public List<TenantInfo> getTenantInfoByName(String tenantName) {
+		return tenantRepository.modifiedFindByTenantName(tenantName.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByEmail(String tenantEmail) {
+		return tenantRepository.modifiedFindByTenantEmail(tenantEmail.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByVerification(String tenantVerified) {
+		return tenantRepository.findByTenantVerified(tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByNameEmail(String tenantName, String tenantEmail) {
+		return tenantRepository.findByTenantNameEmail(tenantName.toLowerCase(), tenantEmail.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByNameVerification(String tenantName, String tenantVerified) {
+		return tenantRepository.findByTenantNameVerification(tenantName.toLowerCase(), tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByEmailVerification(String tenantEmail, String tenantVerified) {
+		return tenantRepository.findByTenantEmailVerification(tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByNameEmailVerification(String tenantName, String tenantEmail, String tenantVerified) {
+		return tenantRepository.findByTenantNameEmailVerification(tenantName.toLowerCase(), tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
 	}
 }

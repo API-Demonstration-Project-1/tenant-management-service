@@ -216,6 +216,14 @@ public void setTenantDBInfo(TenantDBInfo tenantDBInfo) {
 	this.tenantDBInfo = tenantDBInfo;
 }
 
+public List<SubscriptionInfo> getSubscriptionInfoList() {
+	return subscriptionInfoList;
+}
+
+public void setSubscriptionInfoList(List<SubscriptionInfo> subscriptionInfoList) {
+	this.subscriptionInfoList = subscriptionInfoList;
+}
+
 public TenantInfo withId(Integer id){
 	    this.setTenantId(id);;
 	    return this;

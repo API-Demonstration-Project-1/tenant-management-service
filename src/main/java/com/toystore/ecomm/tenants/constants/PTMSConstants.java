@@ -14,4 +14,9 @@ public class PTMSConstants {
 	public static final String ERROR_DESC_FIELD = "error_description";
 	
 	public static final String PASSWORD_FIELD_VALUE = "[PROTECTED]";
+	
+	public static final int FREE_SUBSCRIPTION_TYPE = 1;
+	
+	public static final int MONTHLY_RENEWAL_TYPE = 1;
+	
 }

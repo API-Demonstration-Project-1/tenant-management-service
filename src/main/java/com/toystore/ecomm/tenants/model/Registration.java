@@ -40,7 +40,6 @@ public class Registration   {
 }
 
   	@ApiModelProperty(required = false, value = "This is the ID of the Tenant")
-  	@NotNull
 	public void setTenantId(String tenantId) {
 		this.tenantId = tenantId;
 	}
