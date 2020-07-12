@@ -4,10 +4,7 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.validation.annotation.Validated;
@@ -24,24 +21,12 @@ public class TenantRoleInfo   {
   @Column(name = "ROLE_ID", nullable = false)
   private Integer roleId = null;
   
-  @Column(name = "TENANT_ID", nullable = false)
-  private Integer tenantId = null;
-
   @Column(name = "ROLE_NAME", nullable = false)
   private String roleName = null;
 
   @Column(name = "ROLE_DESC", nullable = false)
   private String roleDesc = null;
-
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false)
-  private TenantInfo tenantInfo;
-
   
-	public void setTenantInfo(TenantInfo tenantInfo) {
-		this.tenantInfo = tenantInfo;
-	}
-
 	/*
 	 * @Column(name = "CREATED_TS", nullable = false) private Timestamp createdTS =
 	 * null;
@@ -85,14 +70,6 @@ public class TenantRoleInfo   {
 	 * public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 	 */
 	
-	public Integer getTenantId() {
-		return tenantId;
-	}
-	
-	public void setTenantId(Integer tenantId) {
-		this.tenantId = tenantId;
-	}
-	
 	public Integer getRoleId() {
 		return roleId;
 	}
@@ -115,10 +92,6 @@ public class TenantRoleInfo   {
 
 	public void setRoleDesc(String roleDesc) {
 		this.roleDesc = roleDesc;
-	}
-
-	public TenantInfo getTenantInfo() {
-		return tenantInfo;
 	}
 
 	public TenantRoleInfo withId(Integer id){

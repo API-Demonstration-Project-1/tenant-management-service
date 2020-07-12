@@ -16,6 +16,7 @@ import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.TenantDBInfo;
 import com.toystore.ecomm.tenants.model.TenantInfo;
+import com.toystore.ecomm.tenants.model.TenantRoleInfo;
 import com.toystore.ecomm.tenants.repository.TenantRepository;
 import com.toystore.ecomm.tenants.util.DBSchemaCreator;
 import com.toystore.ecomm.tenants.util.RandomStringGenerator;
@@ -54,7 +55,15 @@ public class TenantService {
     	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
     	tenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
     	tenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-		
+    	
+    	// If new Tenant registration belongs to any existing Tenant or Org (check by Tenant Name) or Not
+    	if (tenantRepository.findByTenantName(tenantInfo.getTenantName()).isEmpty()) {
+    		tenantInfo.setTenantRoleId(PTMSConstants.TENANT_ADMIN_ROLE_TYPE_CODE);
+    		
+    	} else {
+    		tenantInfo.setTenantRoleId(PTMSConstants.TENANT_USER_ROLE_TYPE_CODE);
+    	}
+    	
 		return tenantRepository.save(tenantInfo);
 	}
 

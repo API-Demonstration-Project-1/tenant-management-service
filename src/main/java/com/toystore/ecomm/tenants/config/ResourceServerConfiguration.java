@@ -22,6 +22,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 			.authorizeRequests()
 			.antMatchers(HttpMethod.POST, "/ptms/registration").permitAll()
 			.antMatchers(HttpMethod.PUT, "/ptms/registration/**").permitAll()
+			.antMatchers(HttpMethod.GET, "/ptms/registration/*/emailverification/**").permitAll()
 			.antMatchers(HttpMethod.GET, "/ptms/registration/**").hasAnyRole("PTMS_ADMIN", "PTMS_USER", "TENANT_ADMIN", "TENANT_USER")
 			.antMatchers(HttpMethod.DELETE, "/ptms/registration/**").hasRole("PTMS_ADMIN")
 			.antMatchers(HttpMethod.POST, "/ptms/login").permitAll()

@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -47,6 +48,9 @@ public class TenantInfo   {
   
   @Column(name = "TENANT_VERIFICATIONCODE", nullable = false)
   private String tenantVerificationCode = null;
+  
+  @Column(name = "ROLE_ID", nullable = false)
+  private Integer tenantRoleId;
 
   @Column(name = "CREATED_TS", nullable = false)
   private Timestamp createdTS = null;
@@ -63,8 +67,10 @@ public class TenantInfo   {
   @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
   private TenantDBInfo tenantDBInfo;
   
-  @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID", nullable = false, insertable = false, updatable = false)
   private TenantRoleInfo tenantRoleInfo;
+
   
   public Integer getTenantId() {
 	return tenantId;
@@ -185,6 +191,14 @@ public TenantInfo tenantName(String tenantName) {
 
 public void setTenantVerificationCode(String tenantVerificationCode) {
 	this.tenantVerificationCode = tenantVerificationCode;
+}
+
+public Integer getTenantRoleId() {
+	return tenantRoleId;
+}
+
+public void setTenantRoleId(Integer tenantRoleId) {
+	this.tenantRoleId = tenantRoleId;
 }
 
 public Timestamp getCreatedTS() {

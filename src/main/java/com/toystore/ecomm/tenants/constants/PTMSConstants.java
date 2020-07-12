@@ -19,4 +19,12 @@ public class PTMSConstants {
 	
 	public static final int MONTHLY_RENEWAL_TYPE = 1;
 	
+	public static final String TENANT_ADMIN_ROLE_NAME = "TENANT_ADMIN";
+	public static final String TENANT_USER_ROLE_NAME = "TENANT_USER";
+	public static final String TENANT_ADMIN_ROLE_DESC = "Tenant Admin";
+	public static final String TENANT_USER_ROLE_DESC = "Tenant User";
+	
+	public static final int TENANT_ADMIN_ROLE_TYPE_CODE = 2;
+	public static final int TENANT_USER_ROLE_TYPE_CODE = 3;
+	
 }
