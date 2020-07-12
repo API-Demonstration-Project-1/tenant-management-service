@@ -6,12 +6,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
 @RefreshScope
+@EnableResourceServer
 @ComponentScan(basePackages = { "com.toystore.ecomm.tenants", "com.toystore.ecomm.tenants.controller" , 
 								"com.toystore.ecomm.tenants.config", "com.toystore.ecomm.tenants.exception",
 								"com.toystore.ecomm.tenants.model", "com.toystore.ecomm.tenants.repository",

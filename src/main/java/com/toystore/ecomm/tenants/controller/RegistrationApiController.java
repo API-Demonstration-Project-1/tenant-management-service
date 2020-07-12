@@ -1,7 +1,9 @@
 package com.toystore.ecomm.tenants.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -12,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,17 +93,76 @@ public class RegistrationApiController implements RegistrationApi {
     	log.debug("registrationByTenantIdGET() invoked with URI Param: " + tenantId);
     	
         try {
-        	TenantInfo tenantInfo = null;
-        	if ((tenantInfo = tenantService.getTenantInfoByTenantId(Integer.parseInt(tenantId))) != null) {
-        		List<TenantInfo> tenantInfoList = new ArrayList<TenantInfo>();
-        		tenantInfoList.add(tenantInfo);
+        		TenantInfo tenantInfo = null;
+        		if ((tenantInfo = tenantService.getTenantInfoByTenantId(Integer.parseInt(tenantId))) == null) {
+        			log.info("registrationByTenantIdGET() exited");
+            		
+        			tenantInfo = null;
+        			
+        			return new ResponseEntity<Registration>(HttpStatus.BAD_REQUEST);
+        		}
+        		
+        		/* Extract Logged User Info - Username & Role - START */
+        	
+		   		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		   		 Object principal = authentication.getPrincipal();
+		   		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		   		 
+		   		 String tenantUsername = null;
+		   		 
+		   		 String loggedUserRole = null;
+		   		 if (principal instanceof UserDetails) {
+		   			 tenantUsername = ((UserDetails)principal).getUsername();
+		   		 } else {
+		   			 tenantUsername = principal.toString();
+		   		 }
+		   		
+		   		 if (authorities != null && !authorities.isEmpty()) {
+		   			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
+		   			 
+		   		 }
+		   		 
+		   		 System.out.println("Current Logged User: " + tenantUsername);
+		   		 System.out.println("Logged User Role: " + loggedUserRole);
+		   		 
+		   		 /* Extract Logged User Info - Username & Role - END */
+		   		 
+		   		
+		   		List<TenantInfo> tenantInfoList = new ArrayList<TenantInfo>(1);
+		   		 
+		   		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+	   			 
+			   		ListIterator<TenantInfo> listIterTenantInfo = tenantService.getTenantInfoByName(tenantService.getTenantInfoByUsername(tenantUsername).getTenantName()).listIterator();
+			   		
+			   		boolean isTenantAccessible = false;
+			   		while (listIterTenantInfo.hasNext()) {
+			   			tenantInfo = listIterTenantInfo.next();
+			   			
+			   			if (tenantInfo.getTenantId() == Integer.parseInt(tenantId)) {
+			   				isTenantAccessible = true;
+			   				break;
+			   			}
+			   		}
+			   		
+			   		if (!isTenantAccessible) {
+			   			log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
+		        		
+		    			return new ResponseEntity<Registration>(HttpStatus.FORBIDDEN);
+			   		}
+		   		} 
+		   		
+		   		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+		   			if (tenantService.getTenantInfoByUsername(tenantUsername).getTenantId() != Integer.parseInt(tenantId)) {
+		   				log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
+		        		
+		    			return new ResponseEntity<Registration>(HttpStatus.FORBIDDEN);
+		   			}
+		   		}
+		   		
+	   			tenantInfoList.add(tenantInfo);
         		
         		return new ResponseEntity<Registration>((ResponsePreparator.prepareGETRegistrationResponse(tenantInfoList)).get(0), HttpStatus.OK);
-        	} else {
-        		log.info("registrationByTenantIdGET() exited");
-        		
-    			return new ResponseEntity<Registration>(HttpStatus.BAD_REQUEST);
-        	}
+        	
         } catch (Exception e) {
         	log.info("registrationByTenantIdGET() exited with error(s)");
     		log.error("Couldn't serialize response for content type application/json", e);
@@ -217,47 +282,101 @@ public class RegistrationApiController implements RegistrationApi {
     	}
     }
     
-    
+    /**
+     * 
+     */
     public ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
     	log.info("registrationGET() invoked");
     	
     	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
         	 try {
+        		 
+        		 /* Extract Logged User Info - Username & Role - START */
+        		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        		 Object principal = authentication.getPrincipal();
+        		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        		 
+        		 String tenantUsername = null;
+        		 String loggedUserRole = null;
+        		 if (principal instanceof UserDetails) {
+        			 tenantUsername = ((UserDetails)principal).getUsername();
+        		 } else {
+        			 tenantUsername = principal.toString();
+        		 }
+        		 
+        		 
+        		 if (authorities != null && !authorities.isEmpty()) {
+        			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
+        			 
+        		 }
+        		 
+        		 System.out.println("Current Logged User: " + tenantUsername);
+        		 //System.out.println("Current Logged User - Tenant Name or Org Name: " + fetchedTenantName);
+        		 System.out.println("Logged User Role: " + loggedUserRole);
+        		 
+        		 /* Extract Logged User Info - Username & Role - END */
+        		 
         		 List<TenantInfo> tenantInfoList = null;
         		 
         		if (tenantName == null) tenantName = PTMSConstants.BLANK_STRING;
         		if (tenantEmail == null) tenantEmail = PTMSConstants.BLANK_STRING;
         		if (tenantVerified == null) tenantVerified = PTMSConstants.BLANK_STRING;
         		
-        		// Search by any one parameter
-        		if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByName(tenantName);
-        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByEmail(tenantEmail);
-        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByVerification(tenantVerified);
+        		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+        			log.info("registrationGET() exited - NOT ACCESSIBLE!!!");
+             		
+         			return new ResponseEntity<List<Registration>>(HttpStatus.FORBIDDEN);
         		}
         		
-        		// Search by any 2 parameters
-        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByNameEmail(tenantName, tenantEmail);
-        		} else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByNameVerification(tenantName, tenantVerified);
-        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByEmailVerification(tenantEmail, tenantVerified);
+        		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+        			String fetchedTenantName = tenantService.getTenantInfoByUsername(tenantUsername).getTenantName();
+        			
+	        		// Search by any 1 parameter with Tenant Name as Static
+	        		if (!tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameEmail(fetchedTenantName, tenantEmail);
+	        		} else if (tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameVerification(fetchedTenantName, tenantVerified);
+	        		}
+	        		
+	        		// Search by all 2 parameters with Tenant Name as Static
+	        		else if (!tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameEmailVerification(fetchedTenantName, tenantEmail, tenantVerified);
+	        		}
+	        		
+	        		// Search by none - Fetch All Tenants
+	        		else {
+	        			tenantInfoList = tenantService.getTenantInfoByName(fetchedTenantName);
+	        		}
+        		} else {
+        			// Search by any one parameter
+	        		if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByName(tenantName);
+	        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByEmail(tenantEmail);
+	        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByVerification(tenantVerified);
+	        		}
+	        		
+	        		// Search by any 2 parameters
+	        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameEmail(tenantName, tenantEmail);
+	        		} else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameVerification(tenantName, tenantVerified);
+	        		} else if (tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByEmailVerification(tenantEmail, tenantVerified);
+	        		}
+	        		
+	        		// Search by all 3 parameters
+	        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        			tenantInfoList = tenantService.getTenantInfoByNameEmailVerification(tenantName, tenantEmail, tenantVerified);
+	        		}
+	        		
+	        		// Search by none - Fetch All Tenants
+	        		else {
+	        			tenantInfoList = tenantService.getAllTenantInfo();
+	        		}
         		}
-        		
-        		// Search by all 3 parameters
-        		else if (!tenantName.equals(PTMSConstants.BLANK_STRING) && !tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
-        			tenantInfoList = tenantService.getTenantInfoByNameEmailVerification(tenantName, tenantEmail, tenantVerified);
-        		}
-        		
-        		// Search by none - Fetch All Tenants
-        		else {
-        			tenantInfoList = tenantService.getAllTenantInfo();
-        		}
-        		
              	if (!tenantInfoList.isEmpty()) {
              		
              		return new ResponseEntity<List<Registration>>(ResponsePreparator.prepareGETRegistrationResponse(tenantInfoList), HttpStatus.OK);

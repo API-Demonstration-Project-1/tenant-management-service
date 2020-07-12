@@ -2,8 +2,6 @@ package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,49 +10,37 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.springframework.validation.annotation.Validated;
+
 /**
  * Registration
  */
 @Validated
 
 @Entity
-@Table(name = "TENANT_DB")
-public class TenantDBInfo   {
+@Table(name = "TENANT_ROLE")
+public class TenantRoleInfo   {
   @Id
-  @Column(name = "TENANT_DB_ID", nullable = false)
-  private Integer tenantDBId = null;
+  @Column(name = "ROLE_ID", nullable = false)
+  private Integer roleId = null;
   
   @Column(name = "TENANT_ID", nullable = false)
   private Integer tenantId = null;
 
-  @Column(name = "TENANT_DB_URL", nullable = false)
-  private String tenantDBUrl = null;
-  
-  @Column(name = "TENANT_DB_NAME", nullable = false)
-  private String tenantDBName = null;
+  @Column(name = "ROLE_NAME", nullable = false)
+  private String roleName = null;
 
+  @Column(name = "ROLE_DESC", nullable = false)
+  private String roleDesc = null;
 
-  @Column(name = "TENANT_DB_USERNAME", nullable = false)
-  private String tenantDBUsername = null;
-
-  @Column(name = "TENANT_DB_PASSWORD", nullable = false)
-  private String tenantDBPassword = null;
-  
   @OneToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false)
   private TenantInfo tenantInfo;
 
-  public Integer getTenantDBId() {
-	return tenantDBId;
-}
-
-public void setTenantDBId(Integer tenantDBId) {
-	this.tenantDBId = tenantDBId;
-}
-
-public void setTenantInfo(TenantInfo tenantInfo) {
-	this.tenantInfo = tenantInfo;
-}
+  
+	public void setTenantInfo(TenantInfo tenantInfo) {
+		this.tenantInfo = tenantInfo;
+	}
 
 	/*
 	 * @Column(name = "CREATED_TS", nullable = false) private Timestamp createdTS =
@@ -67,13 +53,6 @@ public void setTenantInfo(TenantInfo tenantInfo) {
 	 * null;
 	 */
 
-public String getTenantDBName() {
-	return tenantDBName;
-}
-
-public void setTenantDBName(String tenantDBName) {
-	this.tenantDBName = tenantDBName;
-}
 
 	/*
 	 * public TenantInfo getTenantInfo() { return tenantInfo; }
@@ -85,29 +64,7 @@ public void setTenantDBName(String tenantDBName) {
 	/*
 	 * public void setTenantId(Integer tenanId) { this.tenantId = tenanId; }
 	 */
-public String getTenantDBUrl() {
-	return tenantDBUrl;
-}
 
-public void setTenantDBUrl(String tenantDBUrl) {
-	this.tenantDBUrl = tenantDBUrl;
-}
-
-public String getTenantDBUsername() {
-	return tenantDBUsername;
-}
-
-public void setTenantDBUsername(String tenantDBUsername) {
-	this.tenantDBUsername = tenantDBUsername;
-}
-
-public String getTenantDBPassword() {
-	return tenantDBPassword;
-}
-
-public void setTenantDBPassword(String tenantDBPassword) {
-	this.tenantDBPassword = tenantDBPassword;
-}
 
 	/*
 	 * public Integer getTenantId() { return tenantId; }
@@ -136,8 +93,36 @@ public void setTenantDBPassword(String tenantDBPassword) {
 		this.tenantId = tenantId;
 	}
 	
-	public TenantDBInfo withId(Integer id){
-	    this.setTenantDBId(id);;
+	public Integer getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(Integer roleId) {
+		this.roleId = roleId;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public String getRoleDesc() {
+		return roleDesc;
+	}
+
+	public void setRoleDesc(String roleDesc) {
+		this.roleDesc = roleDesc;
+	}
+
+	public TenantInfo getTenantInfo() {
+		return tenantInfo;
+	}
+
+	public TenantRoleInfo withId(Integer id){
+	    this.setRoleId(id);;
 	    return this;
 	}
 	
@@ -149,18 +134,16 @@ public void setTenantDBPassword(String tenantDBPassword) {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TenantDBInfo tenantDBInfo = (TenantDBInfo) o;
+    TenantRoleInfo tenantRoleInfo = (TenantRoleInfo) o;
     return
-    	Objects.equals(this.tenantDBId, tenantDBInfo.tenantDBId) &&
-    	Objects.equals(this.tenantDBUrl, tenantDBInfo.tenantDBUrl) &&
-    	Objects.equals(this.tenantDBName, tenantDBInfo.tenantDBName) &&
-        Objects.equals(this.tenantDBUsername, tenantDBInfo.tenantDBUsername) &&
-        Objects.equals(this.tenantDBPassword, tenantDBInfo.tenantDBPassword);
+    	Objects.equals(this.roleId, tenantRoleInfo.roleId) &&
+    	Objects.equals(this.roleName, tenantRoleInfo.roleName) &&
+    	Objects.equals(this.roleDesc, tenantRoleInfo.roleDesc);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tenantDBId, tenantDBUrl, tenantDBUsername, tenantDBPassword);
+    return Objects.hash(roleId, roleName, roleDesc);
   }
 
   @Override
@@ -168,11 +151,9 @@ public void setTenantDBPassword(String tenantDBPassword) {
     StringBuilder sb = new StringBuilder();
     //sb.append("class Registration {\n");
     
-    sb.append("    tenantDBId: ").append(toIndentedString(tenantDBId)).append("\n");
-    sb.append("    tenantDBUrl: ").append(toIndentedString(tenantDBUrl)).append("\n");
-    sb.append("    tenantDBName: ").append(toIndentedString(tenantDBName)).append("\n");
-    sb.append("    tenantDBUsername: ").append(toIndentedString(tenantDBUsername)).append("\n");
-    sb.append("    tenantDBPassword: ").append(toIndentedString(tenantDBPassword)).append("\n");
+    sb.append("    roleId: ").append(toIndentedString(roleId)).append("\n");
+    sb.append("    roleName: ").append(toIndentedString(roleName)).append("\n");
+    sb.append("    roleDesc: ").append(toIndentedString(roleDesc)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -40,7 +40,7 @@ public class SubscriptionService {
 	public Iterable<SubscriptionInfo> getAllSubscriptions() {
 		return subscriptionRepository.findAll();
 	}
-	public List<SubscriptionInfo> getSubscriptionsByTenantId(Integer tenantId) {
+	public SubscriptionInfo getSubscriptionsByTenantId(Integer tenantId) {
 		return subscriptionRepository.findByTenantId(tenantId);
 	}
 	
@@ -51,8 +51,8 @@ public class SubscriptionService {
 		while (tenantInfoListIter.hasNext()) {
 			TenantInfo tenantInfo = tenantInfoListIter.next();
 			
-			if (subscriptionRepository.findByTenantId(tenantInfo.getTenantId()).size() > 0) {
-				subscriptionInfoList.addAll(subscriptionRepository.findByTenantId(tenantInfo.getTenantId()));
+			if (subscriptionRepository.findByTenantId(tenantInfo.getTenantId()) != null) {
+				subscriptionInfoList.add(subscriptionRepository.findByTenantId(tenantInfo.getTenantId()));
 			}
 		}
 		
@@ -63,15 +63,23 @@ public class SubscriptionService {
 		SubscriptionTypeInfo  subscriptionTypeInfo = (subscriptionTypeRepository.findByPlanName(planName)).get(0);
 		return subscriptionRepository.findByPlanTypeId(subscriptionTypeInfo.getPlanTypeId());
 	}
+	
+	public List<SubscriptionInfo> getSubscriptionsByTenantNamePlanName(String tenantName, String planName) {
+		return subscriptionRepository.findByTenantNamePlanName(tenantName, planName.toLowerCase());
+	}
 
 	public List<SubscriptionInfo> getSubscriptionsByIsValid(String isValid) {
 		return subscriptionRepository.findByIsValid(isValid);
 	}
 	
 	public SubscriptionInfo updateSubscriptionInfo(SubscriptionInfo subscriptionInfo) {
-		SubscriptionInfo existingSubscriptionInfo = subscriptionRepository.findBySubscriptionId(subscriptionInfo.getSubscriptionId()).get(0);
+		SubscriptionInfo existingSubscriptionInfo = subscriptionRepository.findBySubscriptionId(subscriptionInfo.getSubscriptionId());
 		
 		existingSubscriptionInfo.getPlanType().setPlanTypeId(3);
 		return subscriptionRepository.save(existingSubscriptionInfo);
+	}
+	
+	public SubscriptionInfo getSubscriptionById(Integer subscriptionId) {
+		return subscriptionRepository.findBySubscriptionId(subscriptionId);
 	}
 }

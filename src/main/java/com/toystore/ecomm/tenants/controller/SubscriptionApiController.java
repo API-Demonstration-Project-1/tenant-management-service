@@ -3,6 +3,7 @@ package com.toystore.ecomm.tenants.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -17,6 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +29,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Subscription;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.Subscriptionresponse;
+import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.services.SubscriptionService;
+import com.toystore.ecomm.tenants.services.TenantService;
+import com.toystore.ecomm.tenants.util.ResponsePreparator;
 
 import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
@@ -43,6 +52,9 @@ public class SubscriptionApiController implements SubscriptionApi {
     
     @Autowired
     private SubscriptionService subscriptionService;
+    
+    @Autowired
+    private TenantService tenantService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public SubscriptionApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -59,8 +71,85 @@ public class SubscriptionApiController implements SubscriptionApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Subscription>(objectMapper.readValue("{  \"endDate\" : \"endDate\",  \"renewalType\" : \"renewalType\",  \"isValid\" : \"isValid\",  \"planName\" : \"planName\",  \"startDate\" : \"startDate\"}", Subscription.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	
+            	SubscriptionInfo subscriptionInfo = null;
+        		if ((subscriptionInfo = subscriptionService.getSubscriptionById(Integer.parseInt(subscriptionId))) == null) {
+        			log.info("subscriptionBySubscriptionIdGET() exited");
+            		
+        			subscriptionInfo = null;
+        			
+        			return new ResponseEntity<Subscription>(HttpStatus.BAD_REQUEST);
+        		}
+            	
+            	/* Extract Logged User Info - Username & Role - START */
+            	
+		   		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		   		 Object principal = authentication.getPrincipal();
+		   		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		   		 
+		   		 String tenantUsername = null;
+		   		 
+		   		 String loggedUserRole = null;
+		   		 if (principal instanceof UserDetails) {
+		   			 tenantUsername = ((UserDetails)principal).getUsername();
+		   		 } else {
+		   			 tenantUsername = principal.toString();
+		   		 }
+		   		
+		   		 if (authorities != null && !authorities.isEmpty()) {
+		   			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
+		   			 
+		   		 }
+		   		 
+		   		 System.out.println("Current Logged User: " + tenantUsername);
+		   		 System.out.println("Logged User Role: " + loggedUserRole);
+		   		 
+		   		 /* Extract Logged User Info - Username & Role - END */
+		   		 
+		   		//List<SubscriptionInfo> tenantInfoList = new ArrayList<SubscriptionInfo>(1);
+		   		 
+		   		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+	   			 
+			   		ListIterator<SubscriptionInfo> listIterSubscriptionInfo = subscriptionService.getSubscriptionsByTenantName(tenantService.getTenantInfoByUsername(tenantUsername).getTenantName()).listIterator();
+			   		
+			   		boolean isSubscriptionAccessible = false;
+			   		while (listIterSubscriptionInfo.hasNext()) {
+			   			subscriptionInfo = listIterSubscriptionInfo.next();
+			   			
+			   			if (subscriptionInfo.getSubscriptionId() == Integer.parseInt(subscriptionId)) {
+			   				isSubscriptionAccessible = true;
+			   				break;
+			   			}
+			   		}
+			   		
+			   		if (!isSubscriptionAccessible) {
+			   			log.info("subscriptionBySubscriptionIdGET() exited - Given Subscription Id is not accessible!!!!");
+		        		
+		    			return new ResponseEntity<Subscription>(HttpStatus.FORBIDDEN);
+			   		}
+		   		} 
+		   		
+		   		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+		   			if (subscriptionService.getSubscriptionsByTenantId(tenantService.getTenantInfoByUsername(tenantUsername).getTenantId()).getSubscriptionId() != Integer.parseInt(subscriptionId)) {
+		   				log.info("subscriptionBySubscriptionIdGET() exited - Given Subscription Id is not accessible!!!!");
+		        		
+		    			return new ResponseEntity<Subscription>(HttpStatus.FORBIDDEN);
+		   			}
+		   		}
+		   		
+		   		Subscription newItem = new Subscription();
+        		
+        		newItem.setPlanName(subscriptionInfo.getPlanType().getPlanName());
+        		newItem.setTenantName(subscriptionInfo.getTenant().getTenantName());
+        		newItem.setRenewalType(subscriptionInfo.getRenewalType().getRenewalName());
+        		newItem.setIsValid(subscriptionInfo.getIsValid());
+        		newItem.setStartDate(subscriptionInfo.getStartDate().toString());
+        		newItem.setEndDate(subscriptionInfo.getEndDate().toString());
+        		
+        		return new ResponseEntity<Subscription>(newItem, HttpStatus.OK);
+		   		 
+            } catch (Exception e) {
+            	log.info("subscriptionBySubscriptionIdGET() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Subscription>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -69,19 +158,24 @@ public class SubscriptionApiController implements SubscriptionApi {
         return new ResponseEntity<Subscription>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Subscription> subscriptionBySubscriptionIdPOST(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Subscription>(objectMapper.readValue("{  \"endDate\" : \"endDate\",  \"renewalType\" : \"renewalType\",  \"isValid\" : \"isValid\",  \"planName\" : \"planName\",  \"startDate\" : \"startDate\"}", Subscription.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Subscription>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<Subscription>(HttpStatus.NOT_IMPLEMENTED);
-    }
+    // NOT REQUIRED
+	
+	/*
+	 * public ResponseEntity<Subscription>
+	 * subscriptionBySubscriptionIdPOST(@ApiParam(value =
+	 * "",required=true) @PathVariable("subscriptionId") String subscriptionId) {
+	 * String accept = request.getHeader("Accept"); if (accept != null &&
+	 * accept.contains("application/json")) { try { return new
+	 * ResponseEntity<Subscription>(objectMapper.
+	 * readValue("{  \"endDate\" : \"endDate\",  \"renewalType\" : \"renewalType\",  \"isValid\" : \"isValid\",  \"planName\" : \"planName\",  \"startDate\" : \"startDate\"}"
+	 * , Subscription.class), HttpStatus.NOT_IMPLEMENTED); } catch (IOException e) {
+	 * log.error("Couldn't serialize response for content type application/json",
+	 * e); return new
+	 * ResponseEntity<Subscription>(HttpStatus.INTERNAL_SERVER_ERROR); } }
+	 * 
+	 * 
+	 * return new ResponseEntity<Subscription>(HttpStatus.NOT_IMPLEMENTED); }
+	 */
 
     public ResponseEntity<Subscription> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) {
         String accept = request.getHeader("Accept");
@@ -101,40 +195,93 @@ public class SubscriptionApiController implements SubscriptionApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	ListIterator<SubscriptionInfo> subscriptionInfoListIter = null;
-            	
-            	if (tenantName == null && planName == null && isValid == null) {
-            		subscriptionInfoListIter = (StreamSupport.stream(subscriptionService.getAllSubscriptions().spliterator(), false).collect(Collectors.toList())).listIterator();
-            	} else {
-            		if (tenantName != null) {
-            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByTenantName(tenantName)).listIterator();
-            		}
-            		
-            		if (planName != null) {
-            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByPlanName(planName)).listIterator();
-            		}
-            		
-            		if (isValid != null) {
-            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByIsValid(isValid)).listIterator();
-            		}
-            	}
-            	List<Subscription> subscriptionList = new ArrayList<Subscription>();
-            	
-            	while (subscriptionInfoListIter.hasNext()) {
-            		SubscriptionInfo currentItem = subscriptionInfoListIter.next();
-            		Subscription newItem = new Subscription();
-            		
-            		newItem.setPlanName(currentItem.getPlanType().getPlanName());
-            		newItem.setTenantName(currentItem.getTenant().getTenantName());
-            		newItem.setRenewalType(currentItem.getRenewalType().getRenewalName());
-            		newItem.setIsValid(currentItem.getIsValid());
-            		newItem.setStartDate(currentItem.getStartDate().toString());
-            		newItem.setEndDate(currentItem.getEndDate().toString());
-            		
-            		subscriptionList.add(newItem);
-            	}
-            	
-            	return new ResponseEntity<List<Subscription>>(subscriptionList, HttpStatus.OK);
+	            	/* Extract Logged User Info - Username & Role - START */
+		       		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		       		Object principal = authentication.getPrincipal();
+		       		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		       		 
+		       		String tenantUsername = null;
+		       		String loggedUserRole = null;
+		       		if (principal instanceof UserDetails) {
+		       			tenantUsername = ((UserDetails)principal).getUsername();
+		       		} else {
+		       			tenantUsername = principal.toString();
+		       		}
+		       		 
+		       		 
+		       		if (authorities != null && !authorities.isEmpty()) {
+		       			loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
+		       			 
+		       		}
+		       		 
+		       		System.out.println("Current Logged User: " + tenantUsername);
+		       		 //System.out.println("Current Logged User - Tenant Name or Org Name: " + fetchedTenantName);
+		       		System.out.println("Logged User Role: " + loggedUserRole);
+		       		 
+		       		/* Extract Logged User Info - Username & Role - END */
+		       		
+		       		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+	        			log.info("subscriptionGET() exited - NOT ACCESSIBLE!!!");
+	             		
+	         			return new ResponseEntity<List<Subscription>>(HttpStatus.FORBIDDEN);
+	        		}
+		       		ListIterator<SubscriptionInfo> subscriptionInfoListIter = null;
+		       		
+		       		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+		       			String fetchedTenantName = tenantService.getTenantInfoByUsername(tenantUsername).getTenantName();
+		            	
+		            	if (planName == null && isValid == null) {
+		            		subscriptionInfoListIter = (subscriptionService.getSubscriptionsByTenantName(fetchedTenantName)).listIterator();
+		            	} else {
+		            		if (planName != null) {
+		            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByTenantNamePlanName(fetchedTenantName, planName)).listIterator();
+		            		}
+		            		
+						/*
+						 * if (isValid != null) { subscriptionInfoListIter =
+						 * (subscriptionService.getSubscriptionsByIsValid(isValid)).listIterator(); }
+						 */
+		            	}
+		       			
+		       		} else {
+		       			
+		            	if (tenantName == null && planName == null && isValid == null) {
+		            		subscriptionInfoListIter = (StreamSupport.stream(subscriptionService.getAllSubscriptions().spliterator(), false).collect(Collectors.toList())).listIterator();
+		            	} else {
+		            		if (tenantName != null) {
+		            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByTenantName(tenantName)).listIterator();
+		            		}
+		            		
+		            		if (planName != null) {
+		            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByPlanName(planName)).listIterator();
+		            		}
+		            		
+		            		if (isValid != null) {
+		            			subscriptionInfoListIter = (subscriptionService.getSubscriptionsByIsValid(isValid)).listIterator();
+		            		}
+		            	}
+		            	
+		       		}
+		            	
+		            	List<Subscription> subscriptionList = new ArrayList<Subscription>();
+		            	
+		            	while (subscriptionInfoListIter.hasNext()) {
+		            		SubscriptionInfo currentItem = subscriptionInfoListIter.next();
+		            		Subscription newItem = new Subscription();
+		            		
+		            		newItem.setPlanName(currentItem.getPlanType().getPlanName());
+		            		newItem.setTenantName(currentItem.getTenant().getTenantName());
+		            		newItem.setRenewalType(currentItem.getRenewalType().getRenewalName());
+		            		newItem.setIsValid(currentItem.getIsValid());
+		            		newItem.setStartDate(currentItem.getStartDate().toString());
+		            		newItem.setEndDate(currentItem.getEndDate().toString());
+		            		
+		            		subscriptionList.add(newItem);
+		            	}
+		            
+	            	
+	            	return new ResponseEntity<List<Subscription>>(subscriptionList, HttpStatus.OK);
+	            	
                 //return new ResponseEntity<List<Subscription>>(objectMapper.readValue("[ {  \"endDate\" : \"endDate\",  \"renewalType\" : \"renewalType\",  \"isValid\" : \"isValid\",  \"planName\" : \"planName\",  \"startDate\" : \"startDate\"}, {  \"endDate\" : \"endDate\",  \"renewalType\" : \"renewalType\",  \"isValid\" : \"isValid\",  \"planName\" : \"planName\",  \"startDate\" : \"startDate\"} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

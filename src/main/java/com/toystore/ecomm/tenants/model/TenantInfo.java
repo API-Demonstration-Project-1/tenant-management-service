@@ -63,6 +63,9 @@ public class TenantInfo   {
   @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
   private TenantDBInfo tenantDBInfo;
   
+  @OneToOne(mappedBy = "tenantInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private TenantRoleInfo tenantRoleInfo;
+  
   public Integer getTenantId() {
 	return tenantId;
 }
@@ -222,6 +225,14 @@ public List<SubscriptionInfo> getSubscriptionInfoList() {
 
 public void setSubscriptionInfoList(List<SubscriptionInfo> subscriptionInfoList) {
 	this.subscriptionInfoList = subscriptionInfoList;
+}
+
+public TenantRoleInfo getTenantRoleInfo() {
+	return tenantRoleInfo;
+}
+
+public void setTenantRoleInfo(TenantRoleInfo tenantRoleInfo) {
+	this.tenantRoleInfo = tenantRoleInfo;
 }
 
 public TenantInfo withId(Integer id){

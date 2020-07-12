@@ -52,16 +52,27 @@ public interface SubscriptionApi {
         method = RequestMethod.GET)
     ResponseEntity<Subscription> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
 
-
-    @ApiOperation(value = "SubscriptionBySubscriptionId_POST", nickname = "subscriptionBySubscriptionIdPOST", notes = "Subscription using Username & Password", response = Subscription.class, tags={ "subscription", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "", response = Subscription.class),
-        @ApiResponse(code = 400, message = "TODO: Add error message", response = Error.class) })
-    @RequestMapping(value = "/subscription/{subscriptionId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
-        method = RequestMethod.POST)
-    ResponseEntity<Subscription> subscriptionBySubscriptionIdPOST(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+    
+    // NOT REQUIRED
+	/*
+	 * @ApiOperation(value = "SubscriptionBySubscriptionId_POST", nickname =
+	 * "subscriptionBySubscriptionIdPOST", notes =
+	 * "Subscription using Username & Password", response = Subscription.class,
+	 * tags={ "subscription", })
+	 * 
+	 * @ApiResponses(value = {
+	 * 
+	 * @ApiResponse(code = 200, message = "", response = Subscription.class),
+	 * 
+	 * @ApiResponse(code = 400, message = "TODO: Add error message", response =
+	 * Error.class) })
+	 * 
+	 * @RequestMapping(value = "/subscription/{subscriptionId}", produces = {
+	 * "application/json" }, consumes = { "application/json" }, method =
+	 * RequestMethod.POST) ResponseEntity<Subscription>
+	 * subscriptionBySubscriptionIdPOST(@ApiParam(value =
+	 * "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+	 */
 
 
     @ApiOperation(value = "SubscriptionBySubscriptionId_PUT", nickname = "subscriptionBySubscriptionIdPUT", notes = "Update a Subscription by subscriptionId", response = Subscription.class, tags={ "subscription", })

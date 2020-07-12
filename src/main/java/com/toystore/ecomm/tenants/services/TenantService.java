@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
@@ -172,23 +172,47 @@ public class TenantService {
 		return tenantRepository.modifiedFindByTenantEmail(tenantEmail.toLowerCase());
 	}
 	
+	public List<TenantInfo> getTenantInfoByEmail(String tenantUsername, String tenantEmail) {
+		return tenantRepository.modifiedFindByTenantEmail(tenantUsername.toLowerCase(), tenantEmail.toLowerCase());
+	}
+	
 	public List<TenantInfo> getTenantInfoByVerification(String tenantVerified) {
 		return tenantRepository.findByTenantVerified(tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByVerification(String tenantUsername, String tenantVerified) {
+		return tenantRepository.findByTenantVerified(tenantUsername.toLowerCase(), tenantVerified.toLowerCase());
 	}
 	
 	public List<TenantInfo> getTenantInfoByNameEmail(String tenantName, String tenantEmail) {
 		return tenantRepository.findByTenantNameEmail(tenantName.toLowerCase(), tenantEmail.toLowerCase());
 	}
 	
+	public List<TenantInfo> getTenantInfoByNameEmail(String tenantUsername, String tenantName, String tenantEmail) {
+		return tenantRepository.findByTenantNameEmail(tenantUsername.toLowerCase(), tenantName.toLowerCase(), tenantEmail.toLowerCase());
+	}
+	
 	public List<TenantInfo> getTenantInfoByNameVerification(String tenantName, String tenantVerified) {
 		return tenantRepository.findByTenantNameVerification(tenantName.toLowerCase(), tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByNameVerification(String tenantUsername, String tenantName, String tenantVerified) {
+		return tenantRepository.findByTenantNameVerification(tenantUsername.toLowerCase(), tenantName.toLowerCase(), tenantVerified.toLowerCase());
 	}
 	
 	public List<TenantInfo> getTenantInfoByEmailVerification(String tenantEmail, String tenantVerified) {
 		return tenantRepository.findByTenantEmailVerification(tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
 	}
 	
+	public List<TenantInfo> getTenantInfoByEmailVerification(String tenantUsername, String tenantEmail, String tenantVerified) {
+		return tenantRepository.findByTenantEmailVerification(tenantUsername.toLowerCase(), tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
+	}
+	
 	public List<TenantInfo> getTenantInfoByNameEmailVerification(String tenantName, String tenantEmail, String tenantVerified) {
 		return tenantRepository.findByTenantNameEmailVerification(tenantName.toLowerCase(), tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
+	}
+	
+	public List<TenantInfo> getTenantInfoByNameEmailVerification(String tenantUsername, String tenantName, String tenantEmail, String tenantVerified) {
+		return tenantRepository.findByTenantNameEmailVerification(tenantUsername.toLowerCase(), tenantName.toLowerCase(), tenantEmail.toLowerCase(), tenantVerified.toLowerCase());
 	}
 }

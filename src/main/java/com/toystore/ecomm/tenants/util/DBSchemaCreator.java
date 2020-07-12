@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import javax.transaction.Transactional;
+
 public class DBSchemaCreator {
 	private Connection con = null;
 	
@@ -22,6 +24,7 @@ public class DBSchemaCreator {
 		this.dbPassword = dbPassword;
 	}
 	
+	@Transactional
 	public static void createDbSchemaTable(String driverName, String dbUrl, String dbUsername, String dbPassword, String newDbName) throws Exception {
 		DBSchemaCreator creator = new DBSchemaCreator(driverName, dbUrl, dbUsername, dbPassword);
 		creator.createSchema(newDbName);
