@@ -1,14 +1,17 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import com.toystore.ecomm.tenants.model.Data;
-import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Subscriptionresponse
@@ -16,6 +19,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
+@JsonInclude(Include.NON_NULL)
 public class Subscriptionresponse   {
   @JsonProperty("success")
   private Boolean success = null;
@@ -25,6 +29,9 @@ public class Subscriptionresponse   {
 
   @JsonProperty("data")
   private Data data = null;
+  
+  @JsonProperty("resp_data")
+  private Data4 data4 = null;
 
   @JsonProperty("error_code")
   private Integer errorCode = null;
@@ -80,11 +87,8 @@ public class Subscriptionresponse   {
    * Get data
    * @return data
   **/
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
-
+  @ApiModelProperty(required = false, value = "")
   @Valid
-
   public Data getData() {
     return data;
   }
@@ -93,7 +97,17 @@ public class Subscriptionresponse   {
     this.data = data;
   }
 
-  public Subscriptionresponse errorCode(Integer errorCode) {
+  @ApiModelProperty(required = false, value = "")
+  @Valid
+  public Data4 getData4() {
+	return data4;
+  }
+
+  public void setData4(Data4 data4) {
+	  this.data4 = data4;
+  }
+
+public Subscriptionresponse errorCode(Integer errorCode) {
     this.errorCode = errorCode;
     return this;
   }
@@ -127,12 +141,13 @@ public class Subscriptionresponse   {
     return Objects.equals(this.success, subscriptionresponse.success) &&
         Objects.equals(this.message, subscriptionresponse.message) &&
         Objects.equals(this.data, subscriptionresponse.data) &&
+        Objects.equals(this.data4, subscriptionresponse.data4) &&
         Objects.equals(this.errorCode, subscriptionresponse.errorCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(success, message, data, errorCode);
+    return Objects.hash(success, message, data, data4, errorCode);
   }
 
   @Override
@@ -143,6 +158,7 @@ public class Subscriptionresponse   {
     sb.append("    success: ").append(toIndentedString(success)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("    data: ").append(toIndentedString(data)).append("\n");
+    sb.append("    data4: ").append(toIndentedString(data4)).append("\n");
     sb.append("    errorCode: ").append(toIndentedString(errorCode)).append("\n");
     sb.append("}");
     return sb.toString();

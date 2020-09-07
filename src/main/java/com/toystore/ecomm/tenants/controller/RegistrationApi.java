@@ -42,7 +42,7 @@ public interface RegistrationApi {
     @RequestMapping(value = "/registration/{tenantId}",
         produces = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<Registration> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
+    ResponseEntity<Registrationresponse> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId);
 
 
 	/*
@@ -92,7 +92,7 @@ public interface RegistrationApi {
     @RequestMapping(value = "/registration",
         produces = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified);
+    ResponseEntity<Registrationresponse> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified);
 
 
     @ApiOperation(value = "Registration_POST", nickname = "registrationPOST", notes = "Add a new Registration", response = Registrationresponse.class, tags={ "registration", })

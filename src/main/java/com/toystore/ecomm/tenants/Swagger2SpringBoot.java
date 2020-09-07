@@ -17,7 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = { "com.toystore.ecomm.tenants", "com.toystore.ecomm.tenants.controller" , 
 								"com.toystore.ecomm.tenants.config", "com.toystore.ecomm.tenants.exception",
 								"com.toystore.ecomm.tenants.model", "com.toystore.ecomm.tenants.repository",
-								"com.toystore.ecomm.tenants.services"})
+								"com.toystore.ecomm.tenants.services", "com.toystore.ecomm.tenants.util"})
 public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Override

@@ -2,7 +2,10 @@ package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.toystore.ecomm.tenants.model.Data2;
@@ -16,6 +19,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
+@JsonInclude(Include.NON_NULL)
 public class Subscriptionresponse1   {
   @JsonProperty("success")
   private Boolean success = null;

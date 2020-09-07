@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,9 +15,7 @@ import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.TenantDBInfo;
 import com.toystore.ecomm.tenants.model.TenantInfo;
-import com.toystore.ecomm.tenants.model.TenantRoleInfo;
 import com.toystore.ecomm.tenants.repository.TenantRepository;
-import com.toystore.ecomm.tenants.util.DBSchemaCreator;
 import com.toystore.ecomm.tenants.util.RandomStringGenerator;
 
 @Service
@@ -26,12 +23,6 @@ public class TenantService {
 
 	@Autowired
 	private TenantRepository tenantRepository;
-	
-	@Value("${spring.database.driver-class-name}")
-	private String driverName;
-		
-	@Value("${spring.datasource.url}")
-	private String dbUrl;
 	
 	@Value("${spring.datasource.username}")
 	private String dbUsername;
@@ -97,12 +88,8 @@ public class TenantService {
         subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
         subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
         
-        subscriptionInfo.setTenant(existingTenantInfo);
-        
         List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>(1);
 		subscriptionInfoList.add(subscriptionInfo);
-        
-		DBSchemaCreator.createDbSchemaTable(driverName, dbUrl, dbUsername, dbPassword, existingTenantInfo.getTenantUsername());
 		
 		// Create DB-related Info once Verification is confirmed
 		TenantDBInfo tenantDBInfo = new TenantDBInfo();
@@ -114,12 +101,15 @@ public class TenantService {
 		tenantDBInfo.setTenantDBUsername(dbUsername);
 		tenantDBInfo.setTenantDBPassword(dbPassword);
 		
-		tenantDBInfo.setTenantInfo(existingTenantInfo);
-		
 		existingTenantInfo.setTenantDBInfo(tenantDBInfo);
 		existingTenantInfo.setSubscriptionInfoList(subscriptionInfoList);
+		 
+		existingTenantInfo = tenantRepository.save(existingTenantInfo);
 		
-		return tenantRepository.save(existingTenantInfo);
+		// Create DB Schema & necessary tables for the newly Registered Tenant
+		tenantRepository.createDbSchemaNTables(existingTenantInfo.getTenantUsername());
+		
+		return existingTenantInfo;
 	}
 	
 	public boolean isTenantExisting(Integer tenantId) {
@@ -158,7 +148,7 @@ public class TenantService {
 		tenantRepository.deleteById(tenantId);
 		
 		// Drop the corresponding DB Schema as well
-		DBSchemaCreator.dropDbSchemaTable(driverName, dbUrl, dbUsername, dbPassword, dbName);
+		tenantRepository.dropDbSchema(dbName);
 	}
 	
 	public TenantInfo getTenantInfoByTenantId(Integer tenantId) {

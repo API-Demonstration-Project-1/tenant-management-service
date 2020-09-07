@@ -1,10 +1,10 @@
-server:
+#server:
 #  port: 8888
-  ssl:
-     key-store: certs/proarchskeystore.p12
-     key-store-password: proarchs
-     keyStoreType: PKCS12
-     keyAlias: proarchs
+  #ssl:
+     #key-store: certs/proarchskeystore.p12
+     #key-store-password: proarchs
+     #keyStoreType: PKCS12
+     #keyAlias: proarchs
 #     trust-store: certs/proarchstruststore.p12
 #     trust-store-password: proarchs
 #     trust-store-type: PKCS12

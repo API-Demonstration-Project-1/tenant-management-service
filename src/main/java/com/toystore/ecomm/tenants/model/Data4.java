@@ -1,5 +1,6 @@
 package com.toystore.ecomm.tenants.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
@@ -16,29 +17,29 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
-public class Data2   {
-  @JsonProperty("jwttoken")
-  private String jwttoken = null;
+public class Data4   {
+  @JsonProperty("response")
+  private List<Subscription> response = null;
 
-  public Data2 jwttoken(String jwttoken) {
-    this.jwttoken = jwttoken;
+  public Data4 response(List<Subscription> response) {
+    this.response = response;
     return this;
   }
 
   /**
-   * Get jwttoken
-   * @return jwttoken
+   * Get response
+   * @return response
   **/
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
 
-  public String getJwttoken() {
-    return jwttoken;
+  public List<Subscription> getResponse() {
+    return response;
   }
 
-  public void setJwttoken(String jwttoken) {
-    this.jwttoken = jwttoken;
+  public void setResponse(List<Subscription> response) {
+    this.response = response;
   }
 
 
@@ -50,21 +51,21 @@ public class Data2   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Data2 data2 = (Data2) o;
-    return Objects.equals(this.jwttoken, data2.jwttoken);
+    Data4 data3 = (Data4) o;
+    return Objects.equals(this.response, data3.response);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jwttoken);
+    return Objects.hash(response);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Data2 {\n");
+    sb.append("class Data3 {\n");
     
-    sb.append("    jwttoken: ").append(toIndentedString(jwttoken)).append("\n");
+    sb.append("    response: ").append(toIndentedString(response)).append("\n");
     sb.append("}");
     return sb.toString();
   }

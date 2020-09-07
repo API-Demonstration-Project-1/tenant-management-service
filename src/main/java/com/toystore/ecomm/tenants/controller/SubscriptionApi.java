@@ -5,8 +5,6 @@
  */
 package com.toystore.ecomm.tenants.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -37,9 +35,9 @@ public interface SubscriptionApi {
         @ApiResponse(code = 404, message = "TODO: Add error message", response = Error.class) })
     @RequestMapping(value = "/subscription/{subscriptionId}",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        //consumes = { "application/json" },
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
 
 
     @ApiOperation(value = "SubscriptionBySubscriptionId_GET", nickname = "subscriptionBySubscriptionIdGET", notes = "Get a Subscription by subscriptionId", response = Subscription.class, tags={ "subscription", })
@@ -50,7 +48,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         //consumes = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<Subscription> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
 
     
     // NOT REQUIRED
@@ -83,7 +81,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    ResponseEntity<Subscription> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body);
+    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body);
 
 
     @ApiOperation(value = "Subscription_GET", nickname = "subscriptionGET", notes = "Get a list of Subscription", response = Subscription.class, responseContainer = "List", tags={ "subscription", })
@@ -93,7 +91,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         //consumes = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<List<Subscription>> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid);
+    ResponseEntity<Subscriptionresponse> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid);
 
 
     @ApiOperation(value = "Subscription_POST", nickname = "subscriptionPOST", notes = "Add a new Subscription", response = Subscriptionresponse.class, tags={ "subscription", })

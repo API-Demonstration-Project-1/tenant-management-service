@@ -38,7 +38,7 @@ public class SubscriptionInfo {
 	private SubscriptionTypeInfo planType;
 
 	@ManyToOne
-	@JoinColumn(name = "TENANT_ID", insertable = false, updatable = false)
+	@JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false)
 	private TenantInfo tenant;
 
 	@Column(name = "RENEWAL_TYPE_ID", nullable = false)
@@ -197,8 +197,7 @@ public class SubscriptionInfo {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(subscriptionId, tenant.getTenantId(), planType.getPlanTypeId(),
-				renewalType.getRenewalTypeId(), startDate, endDate, isValid);
+		return Objects.hash(subscriptionId, startDate, endDate, isValid);
 	}
 
 	@Override

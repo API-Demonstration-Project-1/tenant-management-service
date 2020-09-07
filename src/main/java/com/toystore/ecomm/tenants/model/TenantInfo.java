@@ -250,7 +250,7 @@ public void setTenantRoleInfo(TenantRoleInfo tenantRoleInfo) {
 }
 
 public TenantInfo withId(Integer id){
-	    this.setTenantId(id);;
+	    this.setTenantId(id);
 	    return this;
 }
 

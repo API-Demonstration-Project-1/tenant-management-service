@@ -26,5 +26,12 @@ public class PTMSConstants {
 	
 	public static final int TENANT_ADMIN_ROLE_TYPE_CODE = 2;
 	public static final int TENANT_USER_ROLE_TYPE_CODE = 3;
+
+	public static final String UNICODE_ENCODING_TYPE = "UTF-8";
+	
+	// For Email Templates
+	public static final String WELCOME_TEMPLATE_KEY = "welcome-template";
+	public static final String POSTVERIFICATION_TEMPLATE_KEY = "postverification-template";
+	
 	
 }

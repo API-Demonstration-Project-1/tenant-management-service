@@ -100,6 +100,8 @@ public class LoginApiController implements LoginApi {
 					return new ResponseEntity<Loginresponse>(resp, HttpStatus.BAD_REQUEST);
 				}
 				
+				
+				// Business Validation to validate that the User, who wants to login, has to be Verified (Tenant's Registration Verification)
 				if (tenantInfo.getTenantVerified().equalsIgnoreCase(PTMSConstants.NO_VALUE)) {
 					log.error("loginPOST() - Registration is Not Verified!!");
 					
@@ -139,13 +141,15 @@ public class LoginApiController implements LoginApi {
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				
-				Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + e.getMessage(), false, -1);
+				Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Server Error - " + e.getMessage(), false, -1);
 				
 				return new ResponseEntity<Loginresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
-		return new ResponseEntity<Loginresponse>(HttpStatus.NOT_IMPLEMENTED);
+		Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "ACCEPT header is required", false, -1);
+		
+		return new ResponseEntity<Loginresponse>(resp, HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	// NOT REQUIRED

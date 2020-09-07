@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.toystore.ecomm.tenants.model.TenantInfo;
 
 @Repository
-public interface TenantRepository extends CrudRepository<TenantInfo, Integer> {
+public interface TenantRepository extends CrudRepository<TenantInfo, Integer>, TenantRepositoryCustom {
 	TenantInfo findByTenantId(Integer tenantId);
 	
 	List<TenantInfo> findByTenantName(String tenantName);

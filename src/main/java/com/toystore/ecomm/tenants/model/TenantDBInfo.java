@@ -33,7 +33,6 @@ public class TenantDBInfo   {
   @Column(name = "TENANT_DB_NAME", nullable = false)
   private String tenantDBName = null;
 
-
   @Column(name = "TENANT_DB_USERNAME", nullable = false)
   private String tenantDBUsername = null;
 

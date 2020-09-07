@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,13 +24,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.toystore.ecomm.tenants.constants.NotificationActions;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
-import com.toystore.ecomm.tenants.services.EmailService;
+import com.toystore.ecomm.tenants.services.NotificationServiceFacade;
 import com.toystore.ecomm.tenants.services.TenantService;
-import com.toystore.ecomm.tenants.util.EmailNotificationPreparator;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
 
 import io.swagger.annotations.ApiParam;
@@ -47,8 +48,10 @@ public class RegistrationApiController implements RegistrationApi {
     private TenantService tenantService;
     
     @Autowired
-    private EmailService emailService;
-    
+    private NotificationServiceFacade notificationService;
+   
+    @Value("${notification.on}")
+	private boolean isNotificationEnabled;
 
     @org.springframework.beans.factory.annotation.Autowired
     public RegistrationApiController(HttpServletRequest request) {
@@ -71,7 +74,7 @@ public class RegistrationApiController implements RegistrationApi {
                 return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
                 
     		} else {
-    			log.info("registrationByTenantIdDELETE() exited");
+    			log.info("registrationByTenantIdDELETE() exited - Given Tenant ID: " + tenantId + " does not exists");
     			
     			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
     			
@@ -80,15 +83,14 @@ public class RegistrationApiController implements RegistrationApi {
     		
     	} catch (Exception e) {
     		log.info("registrationByTenantIdDELETE() exited with error(s)");
-    		log.error("Couldn't serialize response for content type application/json", e);
     		
-    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + e.getMessage(), false, -1);
+    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
             return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
 
-    public ResponseEntity<Registration> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) {
+    public ResponseEntity<Registrationresponse> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) {
     	log.info("registrationByTenantIdGET() invoked");
     	log.debug("registrationByTenantIdGET() invoked with URI Param: " + tenantId);
     	
@@ -99,7 +101,9 @@ public class RegistrationApiController implements RegistrationApi {
             		
         			tenantInfo = null;
         			
-        			return new ResponseEntity<Registration>(HttpStatus.BAD_REQUEST);
+        			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
+        			
+        			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
         		}
         		
         		/* Extract Logged User Info - Username & Role - START */
@@ -122,15 +126,12 @@ public class RegistrationApiController implements RegistrationApi {
 		   			 
 		   		 }
 		   		 
-		   		 System.out.println("Current Logged User: " + tenantUsername);
-		   		 System.out.println("Logged User Role: " + loggedUserRole);
-		   		 
 		   		 /* Extract Logged User Info - Username & Role - END */
 		   		 
 		   		
 		   		List<TenantInfo> tenantInfoList = new ArrayList<TenantInfo>(1);
 		   		 
-		   		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+		   		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_ADMIN_ROLE_NAME)) {
 	   			 
 			   		ListIterator<TenantInfo> listIterTenantInfo = tenantService.getTenantInfoByName(tenantService.getTenantInfoByUsername(tenantUsername).getTenantName()).listIterator();
 			   		
@@ -146,28 +147,36 @@ public class RegistrationApiController implements RegistrationApi {
 			   		
 			   		if (!isTenantAccessible) {
 			   			log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
+			   			
+			   			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
 		        		
-		    			return new ResponseEntity<Registration>(HttpStatus.FORBIDDEN);
+		    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
 			   		}
 		   		} 
 		   		
-		   		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+		   		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_USER_ROLE_NAME)) {
 		   			if (tenantService.getTenantInfoByUsername(tenantUsername).getTenantId() != Integer.parseInt(tenantId)) {
 		   				log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
-		        		
-		    			return new ResponseEntity<Registration>(HttpStatus.FORBIDDEN);
+		   				
+		   				Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
+		   				
+		    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
 		   			}
 		   		}
 		   		
 	   			tenantInfoList.add(tenantInfo);
-        		
-        		return new ResponseEntity<Registration>((ResponsePreparator.prepareGETRegistrationResponse(tenantInfoList)).get(0), HttpStatus.OK);
+	   			
+	   			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "The Registration has been fetched Successfully", true, null);
+	   			
+        		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.OK);
         	
         } catch (Exception e) {
         	log.info("registrationByTenantIdGET() exited with error(s)");
     		log.error("Couldn't serialize response for content type application/json", e);
     		
-            return new ResponseEntity<Registration>(HttpStatus.INTERNAL_SERVER_ERROR);
+    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+    		
+            return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -225,13 +234,15 @@ public class RegistrationApiController implements RegistrationApi {
             	log.info("registrationByTenantIdPUT() exited with error(s)");
         		log.error("Couldn't serialize response for content type application/json", e);
         		
-        		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + e.getMessage(), false, -1);
+        		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
         		
                 return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        return new ResponseEntity<Registrationresponse>(HttpStatus.NOT_IMPLEMENTED);
+        Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
+        
+        return new ResponseEntity<Registrationresponse>(resp, HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Registrationresponse> registrationEmailverificationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@NotNull @ApiParam(value = "This is the Verification Code for this tenant", required = true) @Valid @RequestParam(value = "code", required = true) String code) {
@@ -244,7 +255,10 @@ public class RegistrationApiController implements RegistrationApi {
 				    	if (tenantService.isTenantRegistered(Integer.parseInt(tenantId), code)) {
 				    		TenantInfo updatedTenantInfo = tenantService.updateTenantInfoPostVerification(Integer.parseInt(tenantId));
 				    		
-				    		emailService.sendNotification(EmailNotificationPreparator.prepareEmailForPostVerification(updatedTenantInfo.getTenantEmail()));
+				    		//Notification for Post Verification Confirmation
+				    		if (isNotificationEnabled) {
+				    			notificationService.sendNotification(updatedTenantInfo, NotificationActions.POSTVERIFICATION);
+				    		}
 				    		
 				    		log.info("registrationEmailverificationByTenantIdGET() exited");
 				    		
@@ -276,7 +290,7 @@ public class RegistrationApiController implements RegistrationApi {
     		log.info("registrationEmailverificationByTenantIdGET() exited with error(s)");
     		log.error("Couldn't serialize response for content type application/json", e);
     		
-    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + e.getMessage(), false, -1);
+    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
             return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
@@ -285,57 +299,59 @@ public class RegistrationApiController implements RegistrationApi {
     /**
      * 
      */
-    public ResponseEntity<List<Registration>> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
+    public ResponseEntity<Registrationresponse> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
     	log.info("registrationGET() invoked");
     	
     	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
         	 try {
         		 
-        		 /* Extract Logged User Info - Username & Role - START */
-        		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        		 Object principal = authentication.getPrincipal();
-        		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        		/* Extract Logged User Info - Username & Role - START */
+        		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        		Object principal = authentication.getPrincipal();
+        		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         		 
-        		 String tenantUsername = null;
-        		 String loggedUserRole = null;
-        		 if (principal instanceof UserDetails) {
+        		String tenantUsername = null;
+        		String loggedUserRole = null;
+        		if (principal instanceof UserDetails) {
         			 tenantUsername = ((UserDetails)principal).getUsername();
-        		 } else {
+        		} else {
         			 tenantUsername = principal.toString();
-        		 }
+        		}
         		 
-        		 
-        		 if (authorities != null && !authorities.isEmpty()) {
+        		if (authorities != null && !authorities.isEmpty()) {
         			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
         			 
-        		 }
+        		}
         		 
-        		 System.out.println("Current Logged User: " + tenantUsername);
+        		System.out.println("Current Logged User: " + tenantUsername);
         		 //System.out.println("Current Logged User - Tenant Name or Org Name: " + fetchedTenantName);
-        		 System.out.println("Logged User Role: " + loggedUserRole);
+        		System.out.println("Logged User Role: " + loggedUserRole);
         		 
-        		 /* Extract Logged User Info - Username & Role - END */
+        		/* Extract Logged User Info - Username & Role - END */
         		 
-        		 List<TenantInfo> tenantInfoList = null;
+        		List<TenantInfo> tenantInfoList = null;
         		 
         		if (tenantName == null) tenantName = PTMSConstants.BLANK_STRING;
         		if (tenantEmail == null) tenantEmail = PTMSConstants.BLANK_STRING;
         		if (tenantVerified == null) tenantVerified = PTMSConstants.BLANK_STRING;
         		
-        		if (loggedUserRole.equalsIgnoreCase("TENANT_USER")) {
+        		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_USER_ROLE_NAME)) {
         			log.info("registrationGET() exited - NOT ACCESSIBLE!!!");
+        			
+        			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Logged User do not have access!!", false, -1);
              		
-         			return new ResponseEntity<List<Registration>>(HttpStatus.FORBIDDEN);
+         			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
         		}
         		
-        		if (loggedUserRole.equalsIgnoreCase("TENANT_ADMIN")) {
+        		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_ADMIN_ROLE_NAME)) {
         			String fetchedTenantName = tenantService.getTenantInfoByUsername(tenantUsername).getTenantName();
         			
 	        		// Search by any 1 parameter with Tenant Name as Static
 	        		if (!tenantEmail.equals(PTMSConstants.BLANK_STRING) && tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
 	        			tenantInfoList = tenantService.getTenantInfoByNameEmail(fetchedTenantName, tenantEmail);
-	        		} else if (tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
+	        		} 
+	        		else if (tenantEmail.equals(PTMSConstants.BLANK_STRING) && !tenantVerified.equals(PTMSConstants.BLANK_STRING)) {
 	        			tenantInfoList = tenantService.getTenantInfoByNameVerification(fetchedTenantName, tenantVerified);
 	        		}
 	        		
@@ -378,22 +394,29 @@ public class RegistrationApiController implements RegistrationApi {
 	        		}
         		}
              	if (!tenantInfoList.isEmpty()) {
+             		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "Registration List has been fetched Successfully", true, null);
              		
-             		return new ResponseEntity<List<Registration>>(ResponsePreparator.prepareGETRegistrationResponse(tenantInfoList), HttpStatus.OK);
+             		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.OK);
              	} else {
-             		log.info("registrationGET() exited");
+             		log.info("registrationGET() exited - No Registration(s) for the selected criteria");
              		
-         			return new ResponseEntity<List<Registration>>(new ArrayList<Registration>(0), HttpStatus.BAD_REQUEST);
+             		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "No Registration(s) found for the selected criteria", false, -1);
+             		
+         			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
              	}
              } catch (Exception e) {
              	log.info("registrationGET() exited with error(s)");
          		log.error("Couldn't serialize response for content type application/json", e);
          		
-                 return new ResponseEntity<List<Registration>>(HttpStatus.INTERNAL_SERVER_ERROR);
+         		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+         		
+                return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
              }
         }
-
-        return new ResponseEntity<List<Registration>>(HttpStatus.NOT_IMPLEMENTED);
+        
+        Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
+        
+        return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<Registrationresponse> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
@@ -402,7 +425,6 @@ public class RegistrationApiController implements RegistrationApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	
             	
             	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername())) {
             		log.info("registrationPOST() exited");
@@ -428,11 +450,11 @@ public class RegistrationApiController implements RegistrationApi {
             	
             	log.trace("Created Tenant Info POJO: " + tenantInfo);
             	
-            	//Email for Welcome message
-            	emailService.sendNotification(EmailNotificationPreparator.prepareEmailForWelcome(tenantInfo.getTenantEmail()));
+            	if (isNotificationEnabled) {
             	
-            	//Email for Registration Verification
-            	emailService.sendNotification(EmailNotificationPreparator.prepareEmailForTenantVerification(tenantInfo.getTenantId(), tenantInfo.getTenantEmail(), tenantInfo.getTenantVerificationCode()));
+	            	//Notification for Welcome Message & Registration Verification
+	            	notificationService.sendNotification(tenantInfo, NotificationActions.WELCOME);
+            	}
             	
             	// Prepare Response
             	Registrationresponse registrationResponse = ResponsePreparator.prepareRegistrationResponse(tenantInfo.getTenantId(), "The Registration has been created successfully", true, null);
@@ -444,7 +466,7 @@ public class RegistrationApiController implements RegistrationApi {
             	log.info("registrationPOST() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
                 
-                Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + e.getMessage(), false, -1);
+                Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
         		
                 return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
