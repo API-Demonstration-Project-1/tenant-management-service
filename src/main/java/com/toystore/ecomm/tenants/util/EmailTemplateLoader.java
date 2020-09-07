@@ -8,11 +8,9 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 
-@Component
 public class EmailTemplateLoader {
 	
 	private static final String WELCOME_TEMPLATE = "email-templates/welcome-template.html";
@@ -24,7 +22,7 @@ public class EmailTemplateLoader {
 		if (templateMap == null) {
 			templateMap = new HashMap<String, String>();
 			
-			/*
+			/*	
 			 * For each file in the folder src/main/resources/email-templates, 
 			 * templateMap.add(fileName, fileContents)
 			 */
