@@ -9,6 +9,8 @@ import javax.persistence.Table;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
 /**
  * Registration
  */
@@ -17,6 +19,11 @@ import org.springframework.validation.annotation.Validated;
 @Entity
 @Table(name = "TENANT_ROLE")
 public class TenantRoleInfo   {
+
+  static {
+        POJOFactory.register("TENANTROLEINFO", TenantRoleInfo.class);
+  }
+  
   @Id
   @Column(name = "ROLE_ID", nullable = false)
   private Integer roleId = null;

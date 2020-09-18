@@ -5,22 +5,26 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Subscriptionresponse
  */
+@Component
+
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
-@JsonInclude(Include.NON_NULL)
 public class Subscriptionresponse   {
+  static {
+	  POJOFactory.register("SUBSCRIPTIONRESP", Subscriptionresponse.class);
+  }
   @JsonProperty("success")
   private Boolean success = null;
 

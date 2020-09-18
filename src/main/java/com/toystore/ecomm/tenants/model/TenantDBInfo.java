@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,6 +22,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TENANT_DB")
 public class TenantDBInfo   {
+
+  static {
+        POJOFactory.register("TENANTDBINFO", TenantDBInfo.class);
+  }
+	
   @Id
   @Column(name = "TENANT_DB_ID", nullable = false)
   private Integer tenantDBId = null;

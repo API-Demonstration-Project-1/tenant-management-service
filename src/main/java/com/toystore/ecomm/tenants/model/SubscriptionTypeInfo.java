@@ -2,6 +2,8 @@ package com.toystore.ecomm.tenants.model;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,6 +17,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "SUBSCRIPTION_TYPE")
 public class SubscriptionTypeInfo {
+	
+	static {
+        POJOFactory.register("SUBSCRIPTIONTYPEINFO", SubscriptionTypeInfo.class);
+    }
 
 	@Id
 	@Column(name = "PLAN_TYPE_ID", nullable = false)

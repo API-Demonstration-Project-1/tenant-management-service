@@ -11,6 +11,3 @@ spring:
 logging:
   level:
     com.toystore.ecomm: DEBUG
- 
-
-  

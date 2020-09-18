@@ -1,21 +1,30 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Error
  */
+@Component
+
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Error   {
+  static {
+		  POJOFactory.register("ERROR", Error.class);
+  }
+	
   @JsonProperty("message")
   private String message = null;
 

@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.toystore.ecomm.tenants.constants.NotificationActions;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.Registration;
-import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.services.NotificationServiceFacade;
 import com.toystore.ecomm.tenants.services.TenantService;
@@ -52,13 +52,23 @@ public class RegistrationApiController implements RegistrationApi {
    
     @Value("${notification.on}")
 	private boolean isNotificationEnabled;
+    
+	@Value("${config.response.format.exclude.null}")
+	private boolean toExcludeNull;
 
     @org.springframework.beans.factory.annotation.Autowired
     public RegistrationApiController(HttpServletRequest request) {
         this.request = request;
     }
-
-    public ResponseEntity<Registrationresponse> registrationByTenantIdDELETE(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) {
+    
+    /**
+     * 
+     * @param tenantId
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public ResponseEntity<String> registrationByTenantIdDELETE(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) throws IllegalAccessException, InstantiationException {
     	log.info("registrationByTenantIdDELETE() invoked");
     	log.debug("registrationByTenantIdDELETE() invoked with URI Param: " + tenantId);
     	
@@ -67,30 +77,37 @@ public class RegistrationApiController implements RegistrationApi {
     			tenantService.removeTenantInfo(Integer.parseInt(tenantId));
     			
     			// Prepare Response
-            	Registrationresponse registrationResponse = ResponsePreparator.prepareRegistrationResponse(Integer.parseInt(tenantId), "The Registration has been deleted successfully", true, null);
+            	String registrationResponse = ResponsePreparator.prepareRegistrationResponse(Integer.parseInt(tenantId), "The Registration has been deleted successfully", true, null);
             	
             	log.info("registrationByTenantIdDELETE() exited");
             	
-                return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
+                return new ResponseEntity<String>(registrationResponse, HttpStatus.CREATED);
                 
     		} else {
     			log.info("registrationByTenantIdDELETE() exited - Given Tenant ID: " + tenantId + " does not exists");
     			
-    			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
+    			String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
     			
-    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+    			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     		}
     		
     	} catch (Exception e) {
     		log.info("registrationByTenantIdDELETE() exited with error(s)");
     		
-    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
-            return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
-
-    public ResponseEntity<Registrationresponse> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) {
+    
+    /**
+     * 
+     * @param tenantId
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public ResponseEntity<String> registrationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId) throws IllegalAccessException, InstantiationException {
     	log.info("registrationByTenantIdGET() invoked");
     	log.debug("registrationByTenantIdGET() invoked with URI Param: " + tenantId);
     	
@@ -101,9 +118,9 @@ public class RegistrationApiController implements RegistrationApi {
             		
         			tenantInfo = null;
         			
-        			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
+        			String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
         			
-        			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+        			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
         		}
         		
         		/* Extract Logged User Info - Username & Role - START */
@@ -148,9 +165,9 @@ public class RegistrationApiController implements RegistrationApi {
 			   		if (!isTenantAccessible) {
 			   			log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
 			   			
-			   			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
+			   			String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
 		        		
-		    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
+		    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 			   		}
 		   		} 
 		   		
@@ -158,46 +175,56 @@ public class RegistrationApiController implements RegistrationApi {
 		   			if (tenantService.getTenantInfoByUsername(tenantUsername).getTenantId() != Integer.parseInt(tenantId)) {
 		   				log.info("registrationByTenantIdGET() exited - Given Tenant Id is not accessible");
 		   				
-		   				Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
+		   				String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant ID: " + tenantId + " is not accessible!!", false, -1);
 		   				
-		    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
+		    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 		   			}
 		   		}
 		   		
 	   			tenantInfoList.add(tenantInfo);
 	   			
-	   			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "The Registration has been fetched Successfully", true, null);
+	   			String resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "The Registration has been fetched Successfully", true, null);
 	   			
-        		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.OK);
+        		return new ResponseEntity<String>(resp, HttpStatus.OK);
         	
         } catch (Exception e) {
         	log.info("registrationByTenantIdGET() exited with error(s)");
     		log.error("Couldn't serialize response for content type application/json", e);
     		
-    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
-            return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
+    
     // NOT REQUIRED
-	/*
-	 * public ResponseEntity<Registration>
-	 * registrationByTenantIdPOST(@ApiParam(value =
-	 * "",required=true) @PathVariable("tenantId") String tenantId) { String accept
-	 * = request.getHeader("Accept"); if (accept != null &&
-	 * accept.contains("application/json")) { try { return new
-	 * ResponseEntity<Registration>(objectMapper.
-	 * readValue("{  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"}"
-	 * , Registration.class), HttpStatus.NOT_IMPLEMENTED); } catch (IOException e) {
-	 * log.error("Couldn't serialize response for content type application/json",
-	 * e); return new
-	 * ResponseEntity<Registration>(HttpStatus.INTERNAL_SERVER_ERROR); } }
-	 * 
-	 * return new ResponseEntity<Registration>(HttpStatus.NOT_IMPLEMENTED); }
-	 */
-
-    public ResponseEntity<Registrationresponse> registrationByTenantIdPUT(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
+ 	/*
+ 	 * public ResponseEntity<Registration>
+ 	 * registrationByTenantIdPOST(@ApiParam(value =
+ 	 * "",required=true) @PathVariable("tenantId") String tenantId) { String accept
+ 	 * = request.getHeader("Accept"); if (accept != null &&
+ 	 * accept.contains("application/json")) { try { return new
+ 	 * ResponseEntity<Registration>(objectMapper.
+ 	 * readValue("{  \"tenantEmail\" : \"tenantEmail\",  \"tenantUsername\" : \"tenantUsername\",  \"tenantName\" : \"tenantName\",  \"tenantPassword\" : \"tenantPassword\",  \"tenantVerified\" : \"tenantVerified\"}"
+ 	 * , Registration.class), HttpStatus.NOT_IMPLEMENTED); } catch (IOException e) {
+ 	 * log.error("Couldn't serialize response for content type application/json",
+ 	 * e); return new
+ 	 * ResponseEntity<Registration>(HttpStatus.INTERNAL_SERVER_ERROR); } }
+ 	 * 
+ 	 * return new ResponseEntity<Registration>(HttpStatus.NOT_IMPLEMENTED); }
+ 	 */
+    
+    
+    /**
+     * 
+     * @param tenantId
+     * @param body
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public ResponseEntity<String> registrationByTenantIdPUT(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) throws IllegalAccessException, InstantiationException {
     	log.info("registrationByTenantIdPUT() invoked");
     	log.debug("registrationByTenantIdPUT() invoked with URI Param: " + tenantId);
     	
@@ -217,35 +244,44 @@ public class RegistrationApiController implements RegistrationApi {
                 	log.trace("Updated Tenant Info POJO: " + tenantInfo);
                 	
                 	// Prepare Response
-                	Registrationresponse registrationResponse = ResponsePreparator.prepareRegistrationResponse(Integer.parseInt(tenantId), "The Registration has been updated successfully", true, null);
+                	String registrationResponse = ResponsePreparator.prepareRegistrationResponse(Integer.parseInt(tenantId), "The Registration has been updated successfully", true, null);
                 	
                 	log.info("registrationByTenantIdPUT() exited");
                 	
-                    return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
+                    return new ResponseEntity<String>(registrationResponse, HttpStatus.CREATED);
             		
             	} else {
             		log.info("registrationByTenantIdPUT() exited");
         			
-        			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
+            		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
         			
-        			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+        			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
             	}
             } catch (Exception e) {
             	log.info("registrationByTenantIdPUT() exited with error(s)");
         		log.error("Couldn't serialize response for content type application/json", e);
         		
-        		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+        		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
         		
-                return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
+        String resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
         
-        return new ResponseEntity<Registrationresponse>(resp, HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<String>(resp, HttpStatus.NOT_IMPLEMENTED);
     }
-
-    public ResponseEntity<Registrationresponse> registrationEmailverificationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@NotNull @ApiParam(value = "This is the Verification Code for this tenant", required = true) @Valid @RequestParam(value = "code", required = true) String code) {
+    
+    
+    /**
+     * 
+     * @param tenantId
+     * @param code
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public ResponseEntity<String> registrationEmailverificationByTenantIdGET(@ApiParam(value = "",required=true) @PathVariable("tenantId") String tenantId,@NotNull @ApiParam(value = "This is the Verification Code for this tenant", required = true) @Valid @RequestParam(value = "code", required = true) String code) throws IllegalAccessException, InstantiationException {
     	log.info("registrationEmailverificationByTenantIdGET() invoked");
     	log.debug("registrationEmailverificationByTenantIdGET() invoked with URI Param: " + tenantId + " Query Param: " + code);
     	
@@ -262,44 +298,44 @@ public class RegistrationApiController implements RegistrationApi {
 				    		
 				    		log.info("registrationEmailverificationByTenantIdGET() exited");
 				    		
-				    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Verified", true, null);
+				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Verified", true, null);
 				    		
-				    		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.OK);
+				    		return new ResponseEntity<String>(resp, HttpStatus.OK);
 				    	} else {
 				    		log.info("registrationEmailverificationByTenantIdGET() exited");
 				    		
-				    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Verification Code is not correct. Please make sure your Verification Code is correct", false, -1);
+				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Verification Code is not correct. Please make sure your Verification Code is correct", false, -1);
 				    		
-				    		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+				    		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
 				    	}
 		    		} else {
 		    			log.info("registrationEmailverificationByTenantIdGET() exited");
 		    			
-		    			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Already Verified!!", false, -1);
+		    			String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Already Verified!!", false, -1);
 		    			
-		    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.NOT_ACCEPTABLE);
+		    			return new ResponseEntity<String>(resp, HttpStatus.NOT_ACCEPTABLE);
 		    		}
     			} else {
     				log.info("registrationEmailverificationByTenantIdGET() exited");
 	    			
-	    			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
+    				String resp = ResponsePreparator.prepareRegistrationResponse(null, "Tenant with ID: " + tenantId + " does not exists. Please check", false, -1);
 	    			
-	    			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+	    			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     			}
     	} catch(Exception e) {
     		log.info("registrationEmailverificationByTenantIdGET() exited with error(s)");
     		log.error("Couldn't serialize response for content type application/json", e);
     		
-    		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
-            return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
     
     /**
      * 
      */
-    public ResponseEntity<Registrationresponse> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) {
+    public ResponseEntity<String> registrationGET(@ApiParam(value = "Get List of Tenant Info based on a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get List of Tenant Info based on a given Tenant Email") @Valid @RequestParam(value = "tenantEmail", required = false) String tenantEmail,@ApiParam(value = "Get List of Tenant Info based on Verified or Not Verified") @Valid @RequestParam(value = "tenantVerified", required = false) String tenantVerified) throws IllegalAccessException, InstantiationException {
     	log.info("registrationGET() invoked");
     	
     	String accept = request.getHeader("Accept");
@@ -339,9 +375,9 @@ public class RegistrationApiController implements RegistrationApi {
         		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_USER_ROLE_NAME)) {
         			log.info("registrationGET() exited - NOT ACCESSIBLE!!!");
         			
-        			Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Logged User do not have access!!", false, -1);
+        			String resp = ResponsePreparator.prepareRegistrationResponse(null, "Logged User do not have access!!", false, -1);
              		
-         			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.FORBIDDEN);
+         			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
         		}
         		
         		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_ADMIN_ROLE_NAME)) {
@@ -394,32 +430,39 @@ public class RegistrationApiController implements RegistrationApi {
 	        		}
         		}
              	if (!tenantInfoList.isEmpty()) {
-             		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "Registration List has been fetched Successfully", true, null);
+             		String resp = ResponsePreparator.prepareRegistrationResponse(tenantInfoList, "Registration List has been fetched Successfully", true, null);
              		
-             		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.OK);
+             		return new ResponseEntity<String>(resp, HttpStatus.OK);
              	} else {
              		log.info("registrationGET() exited - No Registration(s) for the selected criteria");
              		
-             		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "No Registration(s) found for the selected criteria", false, -1);
+             		String resp = ResponsePreparator.prepareRegistrationResponse(null, "No Registration(s) found for the selected criteria", false, -1);
              		
-         			return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+         			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
              	}
              } catch (Exception e) {
              	log.info("registrationGET() exited with error(s)");
          		log.error("Couldn't serialize response for content type application/json", e);
          		
-         		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+         		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
          		
-                return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
              }
         }
         
-        Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
+        String resp = ResponsePreparator.prepareRegistrationResponse(null, "ACCEPT header is required", false, -1);
         
-        return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     }
-
-    public ResponseEntity<Registrationresponse> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) {
+    
+    /**
+     * 
+     * @param body
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public ResponseEntity<String> registrationPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Registration body) throws IllegalAccessException, InstantiationException {
     	log.info("registrationPOST() invoked");
     	log.debug("registrationPOST() invoked with Request body: " + body);
         String accept = request.getHeader("Accept");
@@ -429,18 +472,18 @@ public class RegistrationApiController implements RegistrationApi {
             	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername())) {
             		log.info("registrationPOST() exited");
             		
-            		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantUsername()  + " Already Exists!!!", false, -1);
+            		String resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantUsername()  + " Already Exists!!!", false, -1);
             		
-            		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+            		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
             	}
             	if (!tenantService.isTenantEmailUnique(body.getTenantEmail())) {
             		log.info("registrationPOST() exited");
             		
-            		Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantEmail()  + " Already Exists!!!", false, -1);
-            		return new ResponseEntity<Registrationresponse>(resp, HttpStatus.BAD_REQUEST);
+            		String resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantEmail()  + " Already Exists!!!", false, -1);
+            		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
             	}
             	
-            	TenantInfo tenantInfo = new TenantInfo();
+            	TenantInfo tenantInfo = (TenantInfo)POJOFactory.getInstance("TENANTINFO");
             	tenantInfo.setTenantName(body.getTenantName());
             	tenantInfo.setTenantEmail(body.getTenantEmail());
             	tenantInfo.setTenantUsername(body.getTenantUsername());
@@ -457,22 +500,23 @@ public class RegistrationApiController implements RegistrationApi {
             	}
             	
             	// Prepare Response
-            	Registrationresponse registrationResponse = ResponsePreparator.prepareRegistrationResponse(tenantInfo.getTenantId(), "The Registration has been created successfully", true, null);
+            	String registrationResponse = ResponsePreparator.prepareRegistrationResponse(tenantInfo.getTenantId(), "The Registration has been created successfully", true, null);
             	
             	log.info("registrationPOST() exited");
             	
-                return new ResponseEntity<Registrationresponse>(registrationResponse, HttpStatus.CREATED);
+                return new ResponseEntity<String>(registrationResponse, HttpStatus.CREATED);
             } catch (Exception e) {
             	log.info("registrationPOST() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
                 
-                Registrationresponse resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
+                String resp = ResponsePreparator.prepareRegistrationResponse(null, "Server Error - " + e.getMessage(), false, -1);
         		
-                return new ResponseEntity<Registrationresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         
         log.info("registrationPOST() exited");
-        return new ResponseEntity<Registrationresponse>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
     }
+
 }

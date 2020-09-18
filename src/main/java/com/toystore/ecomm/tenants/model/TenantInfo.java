@@ -3,11 +3,6 @@ package com.toystore.ecomm.tenants.model;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +13,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.validation.annotation.Validated;
+
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Registration
@@ -27,6 +30,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TENANT")
 public class TenantInfo   {
+
+  static {
+        POJOFactory.register("TENANTINFO", TenantInfo.class);
+  }
+
   @Id
   @Column(name = "TENANT_ID", nullable = false)
   private Integer tenantId = null;

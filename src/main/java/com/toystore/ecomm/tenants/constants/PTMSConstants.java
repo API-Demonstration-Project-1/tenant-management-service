@@ -21,6 +21,8 @@ public class PTMSConstants {
 	
 	public static final String TENANT_ADMIN_ROLE_NAME = "TENANT_ADMIN";
 	public static final String TENANT_USER_ROLE_NAME = "TENANT_USER";
+	public static final String PTMS_ADMIN_ROLE_NAME = "PTMS_ADMIN";
+	public static final String PTMS_USER_ROLE_NAME = "PTMS_USER";
 	public static final String TENANT_ADMIN_ROLE_DESC = "Tenant Admin";
 	public static final String TENANT_USER_ROLE_DESC = "Tenant User";
 	

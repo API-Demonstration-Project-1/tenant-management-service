@@ -14,6 +14,8 @@ import javax.persistence.Table;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
 /**
  * Subscription
  */
@@ -22,6 +24,10 @@ import org.springframework.validation.annotation.Validated;
 @Entity
 @Table(name = "SUBSCRIPTION")
 public class SubscriptionInfo {
+	
+	static {
+        POJOFactory.register("SUBSCRIPTIONINFO", SubscriptionInfo.class);
+    }
 
 	@Id
 	@Column(name = "SUBSCRIPTION_ID", nullable = false)
@@ -206,9 +212,6 @@ public class SubscriptionInfo {
 		sb.append("class Subscription {\n");
 
 		sb.append("    subscriptionId: ").append(toIndentedString(subscriptionId)).append("\n");
-		sb.append("    tenantId: ").append(toIndentedString(tenant.getTenantId())).append("\n");
-		sb.append("    planTypeId: ").append(toIndentedString(planType.getPlanTypeId())).append("\n");
-		sb.append("    renewalTypeId: ").append(toIndentedString(renewalType.getRenewalTypeId())).append("\n");
 		sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
 		sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
 		sb.append("    isValid: ").append(toIndentedString(isValid)).append("\n");
@@ -226,4 +229,6 @@ public class SubscriptionInfo {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+	
+	
 }

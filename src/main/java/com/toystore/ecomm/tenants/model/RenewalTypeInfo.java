@@ -5,9 +5,15 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.toystore.ecomm.tenants.factory.POJOFactory;
+
 @Entity
 @Table(name = "RENEWAL_TYPE")
 public class RenewalTypeInfo {
+	
+	static {
+        POJOFactory.register("RENEWALTYPEINFO", RenewalTypeInfo.class);
+    }
 	
 	@Id
 	@Column(name = "RENEWAL_TYPE_ID", nullable = false)

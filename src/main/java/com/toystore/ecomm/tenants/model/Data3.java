@@ -5,19 +5,29 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Data2
  */
+@Component
+
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Data3   {
+  
+  
+  static {
+	  POJOFactory.register("DATA3", Data3.class);
+  }
+	 
   @JsonProperty("response")
   private List<Registration> response = null;
 

@@ -4,7 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.Data;
 import com.toystore.ecomm.tenants.model.Data2;
 import com.toystore.ecomm.tenants.model.Data3;
@@ -17,26 +25,55 @@ import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.Subscriptionresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
 
+@Component
 public class ResponsePreparator {
 	
-	public static Loginresponse prepareLoginResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) {
+	static {
+		mapper = new ObjectMapper();
+	}
+	
+	private static ObjectMapper mapper;
+	
+	private static boolean toExcludeNull;
+	
+	@Value("${config.response.format.exclude.null}")
+	public void setToExcludeNull(boolean value) {
+		toExcludeNull = value;
+	}
+	
+	public static String prepareLoginResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) throws IllegalAccessException, InstantiationException {
 		Data2 data = null;
+		
 		if (dataInfo != null) {
-			data = new Data2();
+			data = (Data2)POJOFactory.getInstance("DATA2");
 			data.setJwttoken(dataInfo.toString());
 		}
 		
-		Loginresponse loginResponse = new Loginresponse();
-		
+		Loginresponse loginResponse = (Loginresponse)POJOFactory.getInstance("LOGINRESP");
 		loginResponse.setData(data);
 		loginResponse.setErrorCode(errorCode);
 		loginResponse.setMessage(msg);
 		loginResponse.setSuccess(isSuccess);
-		return loginResponse;
+
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        if (toExcludeNull)
+        	mapper.setSerializationInclusion(Include.NON_NULL);
+        else
+        	mapper.setSerializationInclusion(Include.ALWAYS);
+        
+        String loginRespStr = null;
+        try {
+        	loginRespStr = mapper.writeValueAsString(loginResponse);
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        
+        return loginRespStr;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static Registrationresponse prepareRegistrationResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) {
+	public static String prepareRegistrationResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) throws IllegalAccessException, InstantiationException {
 		
 		Data data = null;
 		Data3 data3 = null;
@@ -44,13 +81,14 @@ public class ResponsePreparator {
 		if (dataInfo != null) {
 			
 			if (dataInfo instanceof List) {
+				@SuppressWarnings("unchecked")
 				ListIterator<TenantInfo> tenantInfoListIter = ((List<TenantInfo>)dataInfo).listIterator();
 				List<Registration> regList = new ArrayList<Registration>();
 				
 				while(tenantInfoListIter.hasNext()) {
 					TenantInfo currentItem = tenantInfoListIter.next();
 					
-					Registration regObj = new Registration();
+					Registration regObj = (Registration)POJOFactory.getInstance("REGISTRATION");
 					regObj.setTenantId(currentItem.getTenantId().toString());
 					regObj.setTenantName(currentItem.getTenantName());
 					regObj.setTenantUsername(currentItem.getTenantUsername());
@@ -61,7 +99,7 @@ public class ResponsePreparator {
 					regList.add(regObj);
 				}
 				
-				data3 = new Data3();
+				data3 = (Data3)POJOFactory.getInstance("DATA3");
 				data3.setResponse(regList);
 				
 			} else {
@@ -70,20 +108,32 @@ public class ResponsePreparator {
 			}
 		}
 		
-		Registrationresponse registrationResponse = new Registrationresponse();
-		
+		Registrationresponse registrationResponse = (Registrationresponse)POJOFactory.getInstance("REGISTRATIONRESP");
 		registrationResponse.setData(data);
 		registrationResponse.setData3(data3);
 		registrationResponse.setErrorCode(errorCode);
 		registrationResponse.setMessage(msg);
 		registrationResponse.setSuccess(isSuccess);
 		
-		
-		return registrationResponse;
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        if (toExcludeNull)
+        	mapper.setSerializationInclusion(Include.NON_NULL);
+        else
+        	mapper.setSerializationInclusion(Include.ALWAYS);
+        
+        String regRespStr = null;
+        try {
+        	regRespStr = mapper.writeValueAsString(registrationResponse);
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        
+		return regRespStr;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static Subscriptionresponse prepareSubscriptionResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) {
+	public static String prepareSubscriptionResponse(Object dataInfo, String msg, boolean isSuccess, Integer errorCode) throws IllegalAccessException, InstantiationException {
 		
 		Data data = null;
 		Data4 data4 = null;
@@ -91,13 +141,15 @@ public class ResponsePreparator {
 		if (dataInfo != null) {
 			
 			if (dataInfo instanceof List) {
+				@SuppressWarnings("unchecked")
 				ListIterator<SubscriptionInfo> subscriptionListIter = ((List<SubscriptionInfo>)dataInfo).listIterator();
 				List<Subscription> subscriptionList = new ArrayList<Subscription>();
 				
 				while(subscriptionListIter.hasNext()) {
 					SubscriptionInfo currentItem = (SubscriptionInfo)subscriptionListIter.next();
 					
-					Subscription subscriptionObj = new Subscription();
+					//Subscription subscriptionObj = new Subscription();
+					Subscription subscriptionObj = (Subscription)POJOFactory.getInstance("SUBSCRIPTION");
 					subscriptionObj.setPlanName(currentItem.getPlanType().getPlanName());
 					subscriptionObj.setRenewalType(currentItem.getRenewalType().getRenewalName());
 					subscriptionObj.setTenantName(currentItem.getTenant().getTenantName());
@@ -108,16 +160,16 @@ public class ResponsePreparator {
 					subscriptionList.add(subscriptionObj);
 				}
 				
-				data4 = new Data4();
+				data4 = (Data4)POJOFactory.getInstance("DATA4");
 				data4.setResponse(subscriptionList);
 				
 			} else {
-				data = new Data();
+				data = (Data)POJOFactory.getInstance("DATA");
 				data.setId((Integer)dataInfo);
 			}
 		}
 		
-		Subscriptionresponse subscriptionresponse = new Subscriptionresponse();
+		Subscriptionresponse subscriptionresponse = (Subscriptionresponse)POJOFactory.getInstance("SUBSCRIPTIONRESP");
 		
 		subscriptionresponse.setData(data);
 		subscriptionresponse.setData4(data4);
@@ -125,28 +177,45 @@ public class ResponsePreparator {
 		subscriptionresponse.setMessage(msg);
 		subscriptionresponse.setSuccess(isSuccess);
 		
-		
-		return subscriptionresponse;
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        if (toExcludeNull)
+        	mapper.setSerializationInclusion(Include.NON_NULL);
+        else
+        	mapper.setSerializationInclusion(Include.ALWAYS);
+        
+        String subsRespStr = null;
+        try {
+        	subsRespStr = mapper.writeValueAsString(subscriptionresponse);
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        
+		return subsRespStr;
 	}
-
-	public static List<Registration> prepareGETRegistrationResponse(List<TenantInfo> tenantInfoList) {
-		ListIterator<TenantInfo> tenantInfoListIter = tenantInfoList.listIterator();
-		List<Registration> regList = new ArrayList<Registration>();
-		
-		while(tenantInfoListIter.hasNext()) {
-			TenantInfo currentItem = tenantInfoListIter.next();
-			
-			Registration regObj = new Registration();
-			regObj.setTenantId(currentItem.getTenantId().toString());
-			regObj.setTenantName(currentItem.getTenantName());
-			regObj.setTenantUsername(currentItem.getTenantUsername());
-			regObj.setTenantPassword(PTMSConstants.PASSWORD_FIELD_VALUE);
-			regObj.setTenantEmail(currentItem.getTenantEmail());
-			regObj.setTenantVerified(currentItem.getTenantVerified());
-			
-			regList.add(regObj);
-		}
-		
-		return regList;
-	}
+	
+	
+	// NOT USED
+	/*
+	 * public static List<Registration>
+	 * prepareGETRegistrationResponse(List<TenantInfo> tenantInfoList) {
+	 * ListIterator<TenantInfo> tenantInfoListIter = tenantInfoList.listIterator();
+	 * List<Registration> regList = new ArrayList<Registration>();
+	 * 
+	 * while(tenantInfoListIter.hasNext()) { TenantInfo currentItem =
+	 * tenantInfoListIter.next();
+	 * 
+	 * Registration regObj = new Registration();
+	 * regObj.setTenantId(currentItem.getTenantId().toString());
+	 * regObj.setTenantName(currentItem.getTenantName());
+	 * regObj.setTenantUsername(currentItem.getTenantUsername());
+	 * regObj.setTenantPassword(PTMSConstants.PASSWORD_FIELD_VALUE);
+	 * regObj.setTenantEmail(currentItem.getTenantEmail());
+	 * regObj.setTenantVerified(currentItem.getTenantVerified());
+	 * 
+	 * regList.add(regObj); }
+	 * 
+	 * return regList; }
+	 */
 }

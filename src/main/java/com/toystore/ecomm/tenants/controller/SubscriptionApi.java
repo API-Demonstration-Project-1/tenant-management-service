@@ -37,7 +37,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         //consumes = { "application/json" },
         method = RequestMethod.DELETE)
-    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+    ResponseEntity<String> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) throws IllegalAccessException, InstantiationException;
 
 
     @ApiOperation(value = "SubscriptionBySubscriptionId_GET", nickname = "subscriptionBySubscriptionIdGET", notes = "Get a Subscription by subscriptionId", response = Subscription.class, tags={ "subscription", })
@@ -48,7 +48,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         //consumes = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId);
+    ResponseEntity<String> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) throws IllegalAccessException, InstantiationException;
 
     
     // NOT REQUIRED
@@ -81,7 +81,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body);
+    ResponseEntity<String> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) throws IllegalAccessException, InstantiationException;
 
 
     @ApiOperation(value = "Subscription_GET", nickname = "subscriptionGET", notes = "Get a list of Subscription", response = Subscription.class, responseContainer = "List", tags={ "subscription", })
@@ -91,7 +91,7 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         //consumes = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<Subscriptionresponse> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid);
+    ResponseEntity<String> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid) throws IllegalAccessException, InstantiationException;
 
 
     @ApiOperation(value = "Subscription_POST", nickname = "subscriptionPOST", notes = "Add a new Subscription", response = Subscriptionresponse.class, tags={ "subscription", })
@@ -101,6 +101,6 @@ public interface SubscriptionApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    ResponseEntity<Subscriptionresponse> subscriptionPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body);
+    ResponseEntity<String> subscriptionPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) throws IllegalAccessException, InstantiationException;
 
 }

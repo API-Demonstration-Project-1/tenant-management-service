@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Login;
-import com.toystore.ecomm.tenants.model.Loginresponse;
 import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.services.TenantService;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
@@ -76,7 +75,7 @@ public class LoginApiController implements LoginApi {
 		return new ResponseEntity<Login>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
-	public ResponseEntity<Loginresponse> loginPOST(@ApiParam(value = "", required = true) @Valid @RequestBody Login body) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<String> loginPOST(@ApiParam(value = "", required = true) @Valid @RequestBody Login body) throws JsonMappingException, JsonProcessingException, IllegalAccessException, InstantiationException {
 		String accept = request.getHeader("Accept");
 		
 		if (accept != null && accept.contains("application/json")) {
@@ -85,9 +84,9 @@ public class LoginApiController implements LoginApi {
 				    (body.getUserPassword() == null || PTMSConstants.BLANK_STRING.equals(body.getUserPassword()))) {
 					log.error("loginPOST() - Credentials are blank/null");
 					
-					Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + "Credentials cannot be blank/null", false, -1);
+					String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + "Credentials cannot be blank/null", false, -1);
 					
-					return new ResponseEntity<Loginresponse>(resp, HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
 				}
 				
 				TenantInfo tenantInfo = tenantService.getTenantInfoByUsername(body.getUserName());
@@ -95,9 +94,9 @@ public class LoginApiController implements LoginApi {
 				if (tenantInfo == null) {
 					log.error("loginPOST() - Username is invalid");
 					
-					Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Entered 'userName' is invalid. Please enter correct one", false, -1);
+					String resp = ResponsePreparator.prepareLoginResponse(null, "Entered 'userName' is invalid. Please enter correct one", false, -1);
 					
-					return new ResponseEntity<Loginresponse>(resp, HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
 				}
 				
 				
@@ -105,9 +104,9 @@ public class LoginApiController implements LoginApi {
 				if (tenantInfo.getTenantVerified().equalsIgnoreCase(PTMSConstants.NO_VALUE)) {
 					log.error("loginPOST() - Registration is Not Verified!!");
 					
-					Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Tenant's Registration is not Verified yet", false, -1);
+					String resp = ResponsePreparator.prepareLoginResponse(null, "Tenant's Registration is not Verified yet", false, -1);
 					
-					return new ResponseEntity<Loginresponse>(resp, HttpStatus.FORBIDDEN);
+					return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 				}
 		        
 				ResponseEntity<String> authServerResp = ServiceInvoker.invokeAuthServer(authSrvcUrl, body.getUserName(), body.getUserPassword());
@@ -120,36 +119,36 @@ public class LoginApiController implements LoginApi {
 					String jwtToken = (new JSONObject(respStr)).getString(PTMSConstants.ACCESS_TOKEN_FIELD);
 			        String loginSuccessMsg = "User with username - " + body.getUserName() + " successfully logged-in.";
 			        
-			        Loginresponse resp = ResponsePreparator.prepareLoginResponse(jwtToken, loginSuccessMsg, true, null);
+			        String resp = ResponsePreparator.prepareLoginResponse(jwtToken, loginSuccessMsg, true, null);
 
-			        return new ResponseEntity<Loginresponse>(resp, HttpStatus.OK);
+			        return new ResponseEntity<String>(resp, HttpStatus.OK);
 				} else {
 					log.error("loginPOST() - Error Response from Auth Server: " + respStr);
 					
 					String errorDesc = (new JSONObject(respStr)).getString(PTMSConstants.ERROR_DESC_FIELD);
-					Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + errorDesc, false, -1);
+					String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + errorDesc, false, -1);
 
-			        return new ResponseEntity<Loginresponse>(resp, httpStatus);
+			        return new ResponseEntity<String>(resp, httpStatus);
 				}
 			} catch (HttpClientErrorException hce) {
 				log.error("loginPOST() - Error Response from Auth Server: " + hce.getLocalizedMessage());
 				
-				Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + hce.getStatusCode().getReasonPhrase(), false, -1);
+				String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + hce.getStatusCode().getReasonPhrase(), false, -1);
 
-		        return new ResponseEntity<Loginresponse>(resp, hce.getStatusCode());
+		        return new ResponseEntity<String>(resp, hce.getStatusCode());
 				
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				
-				Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "Server Error - " + e.getMessage(), false, -1);
+				String resp = ResponsePreparator.prepareLoginResponse(null, "Server Error - " + e.getMessage(), false, -1);
 				
-				return new ResponseEntity<Loginresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
-		Loginresponse resp = ResponsePreparator.prepareLoginResponse(null, "ACCEPT header is required", false, -1);
+		String resp = ResponsePreparator.prepareLoginResponse(null, "ACCEPT header is required", false, -1);
 		
-		return new ResponseEntity<Loginresponse>(resp, HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<String>(resp, HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	// NOT REQUIRED

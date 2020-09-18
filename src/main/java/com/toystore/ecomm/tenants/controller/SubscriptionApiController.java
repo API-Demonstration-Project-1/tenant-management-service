@@ -23,14 +23,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.Subscription;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
-import com.toystore.ecomm.tenants.model.Subscriptionresponse;
 import com.toystore.ecomm.tenants.services.SubscriptionService;
 import com.toystore.ecomm.tenants.services.TenantService;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
 
 import io.swagger.annotations.ApiParam;
+
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
 @Controller
@@ -45,13 +47,13 @@ public class SubscriptionApiController implements SubscriptionApi {
     
     @Autowired
     private TenantService tenantService;
-
+    
     @org.springframework.beans.factory.annotation.Autowired
     public SubscriptionApiController(HttpServletRequest request) {
         this.request = request;
     }
 
-    public ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) {
+    public ResponseEntity<String> subscriptionBySubscriptionIdDELETE(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) throws IllegalAccessException, InstantiationException {
     	log.info("subscriptionBySubscriptionIdDELETE() invoked");
     	log.debug("subscriptionBySubscriptionIdDELETE() invoked with URI Param: " + subscriptionId);
     	
@@ -60,29 +62,29 @@ public class SubscriptionApiController implements SubscriptionApi {
     			subscriptionService.removeSubscription(Integer.parseInt(subscriptionId));
     			
     			// Prepare the Response
-    			Subscriptionresponse subscriptionresponse = ResponsePreparator.prepareSubscriptionResponse(Integer.parseInt(subscriptionId), "The Subscription has been deleted successfully", true, null);
+    			String subscriptionresponse = ResponsePreparator.prepareSubscriptionResponse(Integer.parseInt(subscriptionId), "The Subscription has been deleted successfully", true, null);
     			
     			log.info("subscriptionBySubscriptionIdDELETE() exited");
             	
-                return new ResponseEntity<Subscriptionresponse>(subscriptionresponse, HttpStatus.CREATED);
+                return new ResponseEntity<String>(subscriptionresponse, HttpStatus.CREATED);
                 
     		} else {
     			log.info("subscriptionBySubscriptionIdDELETE() exited - Given Subscription ID: " + subscriptionId + " does not exists");
     			
-    			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
+    			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
     			
-    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+    			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     		}
     	} catch (Exception e) {
     		log.info("subscriptionBySubscriptionIdDELETE() exited with error(s)");
     		
-    		Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
+    		String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
     		
-            return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
 
-    public ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) {
+    public ResponseEntity<String> subscriptionBySubscriptionIdGET(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId) throws IllegalAccessException, InstantiationException {
     	log.info("subscriptionBySubscriptionIdGET() invoked");
     	log.debug("subscriptionBySubscriptionIdGET() invoked with URI Param: " + subscriptionId);
     	
@@ -94,9 +96,9 @@ public class SubscriptionApiController implements SubscriptionApi {
         		
     			subscriptionInfo = null;
     			
-    			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
+    			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
     			
-    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+    			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     		}
         	
         	/* Extract Logged User Info - Username & Role - START */
@@ -140,9 +142,9 @@ public class SubscriptionApiController implements SubscriptionApi {
 		   		if (!isSubscriptionAccessible) {
 		   			log.info("subscriptionBySubscriptionIdGET() exited - Given Subscription Id is not accessible!!!!");
 		   			
-		   			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible!!", false, -1);
+		   			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible!!", false, -1);
 	        		
-	    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.FORBIDDEN);
+	    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 		   		}
 	   		} 
 	   		
@@ -153,9 +155,9 @@ public class SubscriptionApiController implements SubscriptionApi {
 	   			if (loggedUserSubscriptionId != Integer.parseInt(subscriptionId)) {
 	   				log.info("subscriptionBySubscriptionIdGET() exited - Given Subscription Id is not accessible!!!!");
 	   				
-	   				Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible!!", false, -1);
+	   				String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible!!", false, -1);
 	        		
-	    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.FORBIDDEN);
+	    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 	   			}
 	   		}
 	   		
@@ -163,17 +165,17 @@ public class SubscriptionApiController implements SubscriptionApi {
 	   		
 	   		log.info("subscriptionBySubscriptionIdGET() exited");
 	   		
-	   		Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfoList, "The Subscription has been fetched Successfully", true, null);
+	   		String resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfoList, "The Subscription has been fetched Successfully", true, null);
 	   		
-    		return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.OK);
+    		return new ResponseEntity<String>(resp, HttpStatus.OK);
 	   		 
         } catch (Exception e) {
         	log.info("subscriptionBySubscriptionIdGET() exited with Errors");
             log.error("Couldn't serialize response for content type application/json", e);
             
-            Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
+            String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
             
-            return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -196,7 +198,7 @@ public class SubscriptionApiController implements SubscriptionApi {
 	 * return new ResponseEntity<Subscription>(HttpStatus.NOT_IMPLEMENTED); }
 	 */
 
-    public ResponseEntity<Subscriptionresponse> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) {
+    public ResponseEntity<String> subscriptionBySubscriptionIdPUT(@ApiParam(value = "",required=true) @PathVariable("subscriptionId") String subscriptionId,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) throws IllegalAccessException, InstantiationException {
     	log.info("subscriptionBySubscriptionIdPUT() invoked");
     	log.debug("subscriptionBySubscriptionIdPUT() invoked with URI Param: " + subscriptionId);
     	
@@ -209,32 +211,32 @@ public class SubscriptionApiController implements SubscriptionApi {
             		
         			subscriptionInfo = null;
         			
-        			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
+        			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription with ID: " + subscriptionId + " does not exists. Please check", false, -1);
         			
-        			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+        			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
         		}
             	
             	/* Extract Logged User Info - Username & Role - START */
             	
-		   		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		   		 Object principal = authentication.getPrincipal();
-		   		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+		   		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		   		Object principal = authentication.getPrincipal();
+		   		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		   		 
-		   		 String tenantUsername = null;
+		   		String tenantUsername = null;
 		   		 
-		   		 String loggedUserRole = null;
-		   		 if (principal instanceof UserDetails) {
-		   			 tenantUsername = ((UserDetails)principal).getUsername();
-		   		 } else {
+		   		String loggedUserRole = null;
+		   		if (principal instanceof UserDetails) {
+		   			tenantUsername = ((UserDetails)principal).getUsername();
+		   		} else {
 		   			 tenantUsername = principal.toString();
-		   		 }
+		   		}
 		   		
-		   		 if (authorities != null && !authorities.isEmpty()) {
-		   			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
+		   		if (authorities != null && !authorities.isEmpty()) {
+		   			loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
 		   			 
-		   		 }
+		   		}
 		   		 
-		   		 /* Extract Logged User Info - Username & Role - END */
+		   		/* Extract Logged User Info - Username & Role - END */
 		   		 
 		   		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_ADMIN_ROLE_NAME)) {
 		   			
@@ -253,41 +255,41 @@ public class SubscriptionApiController implements SubscriptionApi {
 			   		if (!isSubscriptionAccessible) {
 			   			log.info("subscriptionBySubscriptionIdPUT() exited - Given Subscription Id is not accessible & so the Subscription cannot be modified!!!!");
 			   			
-			   			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible & so the Subscription cannot be modified!!", false, -1);
+			   			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Subscription ID: " + subscriptionId + " is not accessible & so the Subscription cannot be modified!!", false, -1);
 		        		
-		    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.FORBIDDEN);
+		    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 			   		}
-		   			
-            		subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
-            		subscriptionInfo.setRenewalTypeId(Integer.parseInt(body.getRenewalType()));
-            		
-            		subscriptionService.updateSubscriptionInfo(subscriptionInfo);
-            		
-            		log.trace("Updated Subscription Info POJO: " + subscriptionInfo);
-            		
-            		Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(Integer.parseInt(subscriptionId), "The Subscription has been updated Successfully", true, null);
-    		   		
-            		log.info("subscriptionBySubscriptionIdPUT() exited");
-            		
-            		return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.CREATED);
 		   		}
+		   			
+        		subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
+        		subscriptionInfo.setRenewalTypeId(Integer.parseInt(body.getRenewalType()));
+        		
+        		subscriptionService.updateSubscriptionInfo(subscriptionInfo);
+        		
+        		log.trace("Updated Subscription Info POJO: " + subscriptionInfo);
+        		
+        		String resp = ResponsePreparator.prepareSubscriptionResponse(Integer.parseInt(subscriptionId), "The Subscription has been updated Successfully", true, null);
+		   		
+        		log.info("subscriptionBySubscriptionIdPUT() exited");
+        		
+        		return new ResponseEntity<String>(resp, HttpStatus.CREATED);
 		   		
             } catch (Exception e) {
             	log.info("subscriptionBySubscriptionIdPUT() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
                 
-                Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
+                String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
                 
-                return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
+        String resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
         
-        return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<Subscriptionresponse> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid) {
+    public ResponseEntity<String> subscriptionGET(@ApiParam(value = "Get Subscriptions for a given Tenant Name") @Valid @RequestParam(value = "tenantName", required = false) String tenantName,@ApiParam(value = "Get Subscriptions for a given Plan Name") @Valid @RequestParam(value = "planName", required = false) String planName,@ApiParam(value = "Get all Valid or Invalid Subscriptions") @Valid @RequestParam(value = "isValid", required = false) String isValid) throws IllegalAccessException, InstantiationException {
     	log.info("subscriptionGET() invoked");
     	
     	String accept = request.getHeader("Accept");
@@ -317,9 +319,9 @@ public class SubscriptionApiController implements SubscriptionApi {
 		       		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_USER_ROLE_NAME)) {
 	        			log.info("subscriptionGET() exited - NOT ACCESSIBLE!!!");
 	             		
-	        			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Logged User do not have access!!", false, -1);
+	        			String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Logged User do not have access!!", false, -1);
 		        		
-		    			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.FORBIDDEN);
+		    			return new ResponseEntity<String>(resp, HttpStatus.FORBIDDEN);
 	        		}
 		       		
 		       		List<SubscriptionInfo> subscriptionInfoList = null;
@@ -385,34 +387,34 @@ public class SubscriptionApiController implements SubscriptionApi {
 		       		if (!subscriptionInfoList.isEmpty()) {
 		       			log.info("subscriptionGET() exited");
 		       			
-		       			Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfoList, "Subscription List has been fetched Successfully", true, null);
+		       			String resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfoList, "Subscription List has been fetched Successfully", true, null);
 	             		
-	             		return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.OK);
+	             		return new ResponseEntity<String>(resp, HttpStatus.OK);
 	             	} else {
 	             		log.info("subscriptionGET() exited - No Subscription(s) for the selected criteria");
 	             		
-	             		Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "No Subscription(s) found for the selected criteria", false, -1);
+	             		String resp = ResponsePreparator.prepareSubscriptionResponse(null, "No Subscription(s) found for the selected criteria", false, -1);
 	             		
-	         			return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+	         			return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
 	             	}
 	            	
             } catch (Exception e) {
             	log.info("subscriptionGET() exited with error(s)");
          		log.error("Couldn't serialize response for content type application/json", e);
          		
-         		Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
+         		String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
          		
-                return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
+        String resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
         
-        return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     }
 
     
-    public ResponseEntity<Subscriptionresponse> subscriptionPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) {
+    public ResponseEntity<String> subscriptionPOST(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Subscription body) throws IllegalAccessException, InstantiationException {
     	log.info("subscriptionPOST() invoked");
     	
         String accept = request.getHeader("Accept");
@@ -433,7 +435,7 @@ public class SubscriptionApiController implements SubscriptionApi {
 		   		 
 		   		 /* Extract Logged User Info - Username - END */
 		   		 
-                SubscriptionInfo subscriptionInfo = new SubscriptionInfo();
+                SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
                 
                 subscriptionInfo.setTenantId(tenantService.getTenantInfoByUsername(tenantUsername).getTenantId());
                 subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
@@ -443,25 +445,25 @@ public class SubscriptionApiController implements SubscriptionApi {
                 
                 log.trace("Created Subscription Info POJO: " + subscriptionInfo);
                 
-                Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfo.getSubscriptionId(), "The Subscription has been created Successfully", true, null);
+                String resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfo.getSubscriptionId(), "The Subscription has been created Successfully", true, null);
 		   		
         		log.info("subscriptionPOST() exited");
         		
-        		return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.CREATED);
+        		return new ResponseEntity<String>(resp, HttpStatus.CREATED);
                 
             } catch (Exception e) {
             	log.info("subscriptionPOST() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
                 
-                Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
+                String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Server Error - " + e.getMessage(), false, -1);
                 
-                return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        Subscriptionresponse resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
+        String resp = ResponsePreparator.prepareSubscriptionResponse(null, "ACCEPT header is required", false, -1);
         
-        return new ResponseEntity<Subscriptionresponse>(resp, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
     }
 
 }

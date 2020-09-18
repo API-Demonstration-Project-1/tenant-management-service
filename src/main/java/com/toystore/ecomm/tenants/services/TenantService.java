@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
+import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.TenantDBInfo;
 import com.toystore.ecomm.tenants.model.TenantInfo;
@@ -75,7 +76,7 @@ public class TenantService {
 		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
 		
 		// Create Community (Free) Subscription by default once Verification is confirmed
-		SubscriptionInfo subscriptionInfo = new SubscriptionInfo();
+		SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
         
 		subscriptionInfo.withId((new Random()).nextInt(1000));
 		subscriptionInfo.setStartDate(new Date());
@@ -92,7 +93,7 @@ public class TenantService {
 		subscriptionInfoList.add(subscriptionInfo);
 		
 		// Create DB-related Info once Verification is confirmed
-		TenantDBInfo tenantDBInfo = new TenantDBInfo();
+		TenantDBInfo tenantDBInfo = (TenantDBInfo)POJOFactory.getInstance("TENANTDBINFO");
 		
 		tenantDBInfo.withId((new Random()).nextInt(1000));
 		tenantDBInfo.setTenantId(tenantId);
