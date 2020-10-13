@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class Subscription   {
 
   static {
-		  POJOFactory.register("SUBSCRIPTION", Subscription.class);
+	  UIModelFactory.register("SUBSCRIPTION", Subscription.class);
   }
 	 
   @JsonProperty("planName")

@@ -1,7 +1,10 @@
 package com.toystore.ecomm.tenants.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -22,10 +25,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.toystore.ecomm.ptms.daorepo.factory.POJOFactory;
+import com.toystore.ecomm.ptms.daorepo.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.Subscription;
-import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.services.SubscriptionService;
 import com.toystore.ecomm.tenants.services.TenantService;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
@@ -103,28 +106,27 @@ public class SubscriptionApiController implements SubscriptionApi {
         	
         	/* Extract Logged User Info - Username & Role - START */
         	
-	   		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	   		 Object principal = authentication.getPrincipal();
-	   		 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+	   		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	   		Object principal = authentication.getPrincipal();
+	   		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 	   		 
-	   		 String tenantUsername = null;
+	   		String tenantUsername = null;
 	   		 
-	   		 String loggedUserRole = null;
-	   		 if (principal instanceof UserDetails) {
+	   		String loggedUserRole = null;
+	   		if (principal instanceof UserDetails) {
 	   			 tenantUsername = ((UserDetails)principal).getUsername();
-	   		 } else {
+	   		} else {
 	   			 tenantUsername = principal.toString();
-	   		 }
+	   		}
 	   		
-	   		 if (authorities != null && !authorities.isEmpty()) {
+	   		if (authorities != null && !authorities.isEmpty()) {
 	   			 loggedUserRole = ((authorities.iterator().next()).getAuthority()).substring(5);
 	   			 
-	   		 }
+	   		}
 	   		 
-	   		 /* Extract Logged User Info - Username & Role - END */
+	   		/* Extract Logged User Info - Username & Role - END */
 	   		 
 	   		List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>(1);
-	   		subscriptionInfo = null;
 	   		if (loggedUserRole.equalsIgnoreCase(PTMSConstants.TENANT_ADMIN_ROLE_NAME)) {
    			 
 		   		ListIterator<SubscriptionInfo> listIterSubscriptionInfo = subscriptionService.getSubscriptionsByTenantName(tenantService.getTenantInfoByUsername(tenantUsername).getTenantName()).listIterator();
@@ -441,8 +443,23 @@ public class SubscriptionApiController implements SubscriptionApi {
                 subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
                 subscriptionInfo.setRenewalTypeId(Integer.parseInt(body.getRenewalType()));
                 
-                subscriptionService.saveSubscriptionInfo(subscriptionInfo);
+                if (body.getStartDate() != null && !PTMSConstants.BLANK_STRING.equals(body.getStartDate())) {
+                	SimpleDateFormat sdf = new SimpleDateFormat(PTMSConstants.SUBS_DATE_PATTERN);
+                	
+                	try {
+                		subscriptionInfo.setStartDate(sdf.parse(body.getStartDate()));
+                	} catch (ParseException pe) {
+                		log.info("subscriptionPOST() exited with Errors");
+                		
+                		String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Date Format is not correct. Please enter in this format: 'dd-MM-yyyy'", false, -1);
+                        
+                        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
+                	}
+                } else {
+                	subscriptionInfo.setStartDate(new Date());
+                }
                 
+                subscriptionService.saveSubscriptionInfo(subscriptionInfo);
                 log.trace("Created Subscription Info POJO: " + subscriptionInfo);
                 
                 String resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfo.getSubscriptionId(), "The Subscription has been created Successfully", true, null);

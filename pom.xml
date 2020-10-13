@@ -49,8 +49,11 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
+
+
 		</plugins>
 	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -158,12 +161,20 @@
 			<artifactId>json</artifactId>
 			<version>20200518</version>
 		</dependency>
-		
-		 <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.toystore.ecomm.ptms</groupId>
+			<artifactId>ptms-dao-repo</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/ptms-dao-repo.jar</systemPath>
+		</dependency>
 
 	</dependencies>
 

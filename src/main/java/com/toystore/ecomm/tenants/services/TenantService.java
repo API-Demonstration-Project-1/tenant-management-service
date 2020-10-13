@@ -4,19 +4,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.toystore.ecomm.ptms.daorepo.factory.POJOFactory;
+import com.toystore.ecomm.ptms.daorepo.model.SubscriptionInfo;
+import com.toystore.ecomm.ptms.daorepo.model.TenantDBInfo;
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
+import com.toystore.ecomm.ptms.daorepo.repository.TenantRepository;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
-import com.toystore.ecomm.tenants.model.SubscriptionInfo;
-import com.toystore.ecomm.tenants.model.TenantDBInfo;
-import com.toystore.ecomm.tenants.model.TenantInfo;
-import com.toystore.ecomm.tenants.repository.TenantRepository;
 import com.toystore.ecomm.tenants.util.RandomStringGenerator;
 
 @Service
@@ -41,7 +40,7 @@ public class TenantService {
 	 */
 
 	public TenantInfo saveTenantInfo(TenantInfo tenantInfo) {
-		tenantInfo.withId((new Random()).nextInt(1000));
+		//tenantInfo.withId((new Random()).nextInt(1000));
 		tenantInfo.setTenantVerified(PTMSConstants.NO_VALUE);
     	tenantInfo.setTenantVerificationCode(RandomStringGenerator.getRandomAlphaNumericString(15));
     	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
@@ -78,7 +77,7 @@ public class TenantService {
 		// Create Community (Free) Subscription by default once Verification is confirmed
 		SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
         
-		subscriptionInfo.withId((new Random()).nextInt(1000));
+		//subscriptionInfo.withId((new Random()).nextInt(1000));
 		subscriptionInfo.setStartDate(new Date());
 		subscriptionInfo.setEndDate(new Date());
         subscriptionInfo.setTenantId(tenantId);
@@ -95,7 +94,6 @@ public class TenantService {
 		// Create DB-related Info once Verification is confirmed
 		TenantDBInfo tenantDBInfo = (TenantDBInfo)POJOFactory.getInstance("TENANTDBINFO");
 		
-		tenantDBInfo.withId((new Random()).nextInt(1000));
 		tenantDBInfo.setTenantId(tenantId);
 		tenantDBInfo.setTenantDBUrl(dbUrlPartial + existingTenantInfo.getTenantUsername() + "?useSSL=false");
 		tenantDBInfo.setTenantDBName(existingTenantInfo.getTenantUsername());

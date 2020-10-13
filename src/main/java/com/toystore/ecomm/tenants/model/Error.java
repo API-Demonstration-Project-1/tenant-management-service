@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class Error   {
   static {
-		  POJOFactory.register("ERROR", Error.class);
+	  UIModelFactory.register("ERROR", Error.class);
   }
 	
   @JsonProperty("message")

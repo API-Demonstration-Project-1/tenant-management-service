@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.toystore.ecomm.tenants.model.TenantInfo;
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
+
 
 @Service
 public class NotificationServiceFacadeImpl implements NotificationServiceFacade {

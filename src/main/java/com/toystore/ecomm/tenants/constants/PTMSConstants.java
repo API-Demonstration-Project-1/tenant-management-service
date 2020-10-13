@@ -35,5 +35,14 @@ public class PTMSConstants {
 	public static final String WELCOME_TEMPLATE_KEY = "welcome-template";
 	public static final String POSTVERIFICATION_TEMPLATE_KEY = "postverification-template";
 	
+	// Subscription Renewal Types
+	public static final String SUBS_MONTHLY = "Monthly";
+	public static final String SUBS_QUATERLY = "Quaterly";
+	public static final String SUBS_HALFYEARLY = "HalfYearly";
+	public static final String SUBS_YEARLY = "Yearly";
+	public static final String SUBS_TWOYEARS = "2Years";
+	public static final String SUBS_THREEYEARS = "3Years";
+	public static final String SUBS_FIVEYEARS = "5Years";
 	
+	public static final String SUBS_DATE_PATTERN = "dd-MM-yyyy";
 }

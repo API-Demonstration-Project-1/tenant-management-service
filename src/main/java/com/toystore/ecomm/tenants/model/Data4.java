@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class Data4   {
   
   static {
-	  POJOFactory.register("DATA4", Data4.class);
+	  UIModelFactory.register("DATA4", Data4.class);
   }
 	 
   @JsonProperty("response")

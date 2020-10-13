@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class Subscriptionresponse   {
   static {
-	  POJOFactory.register("SUBSCRIPTIONRESP", Subscriptionresponse.class);
+	  UIModelFactory.register("SUBSCRIPTIONRESP", Subscriptionresponse.class);
   }
   @JsonProperty("success")
   private Boolean success = null;

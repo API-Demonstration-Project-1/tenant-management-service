@@ -11,8 +11,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.toystore.ecomm.ptms.daorepo.model.SubscriptionInfo;
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
 import com.toystore.ecomm.tenants.model.Data;
 import com.toystore.ecomm.tenants.model.Data2;
 import com.toystore.ecomm.tenants.model.Data3;
@@ -21,9 +23,7 @@ import com.toystore.ecomm.tenants.model.Loginresponse;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.Subscription;
-import com.toystore.ecomm.tenants.model.SubscriptionInfo;
 import com.toystore.ecomm.tenants.model.Subscriptionresponse;
-import com.toystore.ecomm.tenants.model.TenantInfo;
 
 @Component
 public class ResponsePreparator {
@@ -45,11 +45,11 @@ public class ResponsePreparator {
 		Data2 data = null;
 		
 		if (dataInfo != null) {
-			data = (Data2)POJOFactory.getInstance("DATA2");
+			data = (Data2)UIModelFactory.getInstance("DATA2");
 			data.setJwttoken(dataInfo.toString());
 		}
 		
-		Loginresponse loginResponse = (Loginresponse)POJOFactory.getInstance("LOGINRESP");
+		Loginresponse loginResponse = (Loginresponse)UIModelFactory.getInstance("LOGINRESP");
 		loginResponse.setData(data);
 		loginResponse.setErrorCode(errorCode);
 		loginResponse.setMessage(msg);
@@ -88,7 +88,7 @@ public class ResponsePreparator {
 				while(tenantInfoListIter.hasNext()) {
 					TenantInfo currentItem = tenantInfoListIter.next();
 					
-					Registration regObj = (Registration)POJOFactory.getInstance("REGISTRATION");
+					Registration regObj = (Registration)UIModelFactory.getInstance("REGISTRATION");
 					regObj.setTenantId(currentItem.getTenantId().toString());
 					regObj.setTenantName(currentItem.getTenantName());
 					regObj.setTenantUsername(currentItem.getTenantUsername());
@@ -99,16 +99,16 @@ public class ResponsePreparator {
 					regList.add(regObj);
 				}
 				
-				data3 = (Data3)POJOFactory.getInstance("DATA3");
+				data3 = (Data3)UIModelFactory.getInstance("DATA3");
 				data3.setResponse(regList);
 				
 			} else {
-				data = new Data();
+				data = (Data)UIModelFactory.getInstance("DATA");
 				data.setId((Integer)dataInfo);
 			}
 		}
 		
-		Registrationresponse registrationResponse = (Registrationresponse)POJOFactory.getInstance("REGISTRATIONRESP");
+		Registrationresponse registrationResponse = (Registrationresponse)UIModelFactory.getInstance("REGISTRATIONRESP");
 		registrationResponse.setData(data);
 		registrationResponse.setData3(data3);
 		registrationResponse.setErrorCode(errorCode);
@@ -149,7 +149,7 @@ public class ResponsePreparator {
 					SubscriptionInfo currentItem = (SubscriptionInfo)subscriptionListIter.next();
 					
 					//Subscription subscriptionObj = new Subscription();
-					Subscription subscriptionObj = (Subscription)POJOFactory.getInstance("SUBSCRIPTION");
+					Subscription subscriptionObj = (Subscription)UIModelFactory.getInstance("SUBSCRIPTION");
 					subscriptionObj.setPlanName(currentItem.getPlanType().getPlanName());
 					subscriptionObj.setRenewalType(currentItem.getRenewalType().getRenewalName());
 					subscriptionObj.setTenantName(currentItem.getTenant().getTenantName());
@@ -160,16 +160,16 @@ public class ResponsePreparator {
 					subscriptionList.add(subscriptionObj);
 				}
 				
-				data4 = (Data4)POJOFactory.getInstance("DATA4");
+				data4 = (Data4)UIModelFactory.getInstance("DATA4");
 				data4.setResponse(subscriptionList);
 				
 			} else {
-				data = (Data)POJOFactory.getInstance("DATA");
+				data = (Data)UIModelFactory.getInstance("DATA");
 				data.setId((Integer)dataInfo);
 			}
 		}
 		
-		Subscriptionresponse subscriptionresponse = (Subscriptionresponse)POJOFactory.getInstance("SUBSCRIPTIONRESP");
+		Subscriptionresponse subscriptionresponse = (Subscriptionresponse)UIModelFactory.getInstance("SUBSCRIPTIONRESP");
 		
 		subscriptionresponse.setData(data);
 		subscriptionresponse.setData4(data4);

@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.tenants.constants.NotificationActions;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.util.EmailTemplateLoader;
 
 @Service
@@ -40,7 +40,7 @@ public class EmailService {
 	
 	private static final String BACKGROUND_IMAGE = "email-templates/images/background.png";
     private static final String LOGO_BACKGROUND_IMAGE = "email-templates/images/logo-background.png";
-    private static final String THYMELEAF_BANNER_IMAGE = "email-templates/images/thymeleaf-banner.png";
+    private static final String THYMELEAF_BANNER_IMAGE = "email-templates/images/proarchs_logo_orange_bkg.jpg";
     
     private static final String PNG_MIME = "image/png";
 

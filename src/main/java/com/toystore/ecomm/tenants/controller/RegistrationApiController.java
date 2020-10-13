@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.toystore.ecomm.ptms.daorepo.factory.POJOFactory;
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.tenants.constants.NotificationActions;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.factory.POJOFactory;
 import com.toystore.ecomm.tenants.model.Registration;
-import com.toystore.ecomm.tenants.model.TenantInfo;
 import com.toystore.ecomm.tenants.services.NotificationServiceFacade;
 import com.toystore.ecomm.tenants.services.TenantService;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;

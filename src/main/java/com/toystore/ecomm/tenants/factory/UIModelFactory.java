@@ -3,7 +3,7 @@ package com.toystore.ecomm.tenants.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class POJOFactory {
+public class UIModelFactory {
 	private static final Map<String, Class<?>> instances = new HashMap<>();
 
     public static void register(String pojoName, Class<?> instance) {
