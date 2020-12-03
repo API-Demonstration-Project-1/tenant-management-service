@@ -20,195 +20,248 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
-public class Subscription   {
+public class Subscription {
 
-  static {
-	  UIModelFactory.register("SUBSCRIPTION", Subscription.class);
-  }
-	 
-  @JsonProperty("planName")
-  private String planName = null;
-  
-  @JsonProperty("tenantName")
-  private String tenantName = null;
+	static {
+		UIModelFactory.register("SUBSCRIPTION", Subscription.class);
+	}
 
-  @JsonProperty("renewalType")
-  private String renewalType = null;
+	@JsonProperty("planName")
+	private String planName = null;
 
-  @JsonProperty("startDate")
-  private String startDate = null;
+	@JsonProperty("tenantName")
+	private String tenantName = null;
 
-  @JsonProperty("endDate")
-  private String endDate = null;
+	@JsonProperty("renewalType")
+	private String renewalType = null;
 
-  @JsonProperty("isValid")
-  private String isValid = null;
+	@JsonProperty("startDate")
+	private String startDate = null;
 
-  public Subscription planName(String planName) {
-    this.planName = planName;
-    return this;
-  }
+	@JsonProperty("endDate")
+	private String endDate = null;
 
-  /**
-   * This is the Plan Name
-   * @return planName
-  **/
-  @ApiModelProperty(required = true, value = "This is the Plan Name")
-  @NotNull
+	@JsonProperty("isValid")
+	private String isValid = null;
 
+	@JsonProperty("paymentMethod")
+	private String paymentMethod = null;
 
-  public String getPlanName() {
-    return planName;
-  }
+	@JsonProperty("cancelAtPeriodEnd")
+	private String cancelAtPeriodEnd = null;
+	
+	@JsonProperty("cardToken")
+	private String cardToken = null;
 
-  public void setPlanName(String planName) {
-    this.planName = planName;
-  }
-  
-  public Subscription tenantName(String tenantName) {
-    this.tenantName = tenantName;
-    return this;
-  }
-  
-  /**
-  * This is the Tenant Name
-  * @return tenantName
- **/
- @ApiModelProperty(required = false, value = "This is the Tenant Name")
+	public Subscription planName(String planName) {
+		this.planName = planName;
+		return this;
+	}
 
-  public String getTenantName() {
-	return tenantName;
+	/**
+	 * This is the Plan Name
+	 * 
+	 * @return planName
+	 **/
+	@ApiModelProperty(required = true, value = "This is the Plan Name")
+	@NotNull
+	public String getPlanName() {
+		return planName;
+	}
+
+	public void setPlanName(String planName) {
+		this.planName = planName;
+	}
+
+	public Subscription tenantName(String tenantName) {
+		this.tenantName = tenantName;
+		return this;
+	}
+
+	/**
+	 * This is the Tenant Name
+	 * 
+	 * @return tenantName
+	 **/
+	@ApiModelProperty(required = false, value = "This is the Tenant Name")
+	public String getTenantName() {
+		return tenantName;
+	}
+
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
+
+	public Subscription renewalType(String renewalType) {
+		this.renewalType = renewalType;
+		return this;
+	}
+
+	/**
+	 * This is the Renewal Type
+	 * 
+	 * @return renewalType
+	 **/
+	@ApiModelProperty(required = true, value = "This is the Renewal Type")
+	@NotNull
+	public String getRenewalType() {
+		return renewalType;
+	}
+
+	public void setRenewalType(String renewalType) {
+		this.renewalType = renewalType;
+	}
+
+	public Subscription startDate(String startDate) {
+		this.startDate = startDate;
+		return this;
+	}
+
+	/**
+	 * This indicates the Start Date of Subscription
+	 * 
+	 * @return startDate
+	 **/
+	@ApiModelProperty(required = false, value = "This indicates the Start Date of Subscription")
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public Subscription endDate(String endDate) {
+		this.endDate = endDate;
+		return this;
+	}
+
+	/**
+	 * This indicates the End Date of Subscription
+	 * 
+	 * @return endDate
+	 **/
+	@ApiModelProperty(required = false, value = "This indicates the End Date of Subscription")
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public Subscription isValid(String isValid) {
+		this.isValid = isValid;
+		return this;
+	}
+
+	/**
+	 * This indicates whether the Current Subscription is Valid or Not
+	 * 
+	 * @return isValid
+	 **/
+	@ApiModelProperty(required = false, value = "This indicates whether the Current Subscription is Valid or Not")
+	public String getIsValid() {
+		return isValid;
+	}
+
+	public void setIsValid(String isValid) {
+		this.isValid = isValid;
+	}
+	
+	
+	public Subscription paymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+		return this;
+	}
+	
+	@ApiModelProperty(required = false, value = "This gives the payment method (card, upi, wallet) used")
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+	
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+	
+	public Subscription cancelAtPeriodEnd(String cancelAtPeriodEnd) {
+		this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+		return this;
+	}
+
+	@ApiModelProperty(required = true, value = "This tells whether Subscription should be cancelled as soon as it expires")
+	@NotNull
+	public String getCancelAtPeriodEnd() {
+		return cancelAtPeriodEnd;
+	}
+
+	public void setCancelAtPeriodEnd(String cancelAtPeriodEnd) {
+		this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+	}
+
+	public Subscription cardToken(String cardToken) {
+		this.cardToken = cardToken;
+		return this;
+	}
+	
+	@ApiModelProperty(required = false, value = "This gives the Card Token")
+	public String getCardToken() {
+		return cardToken;
+	}
+
+	public void setCardToken(String cardToken) {
+		this.cardToken = cardToken;
+	}
+
+	@Override
+	public boolean equals(java.lang.Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Subscription subscription = (Subscription) o;
+		return Objects.equals(this.planName, subscription.planName)
+				&& Objects.equals(this.tenantName, subscription.tenantName)
+				&& Objects.equals(this.renewalType, subscription.renewalType)
+				&& Objects.equals(this.startDate, subscription.startDate)
+				&& Objects.equals(this.endDate, subscription.endDate)
+				&& Objects.equals(this.isValid, subscription.isValid)
+				&& Objects.equals(this.paymentMethod, subscription.paymentMethod)
+				&& Objects.equals(this.cancelAtPeriodEnd, subscription.cancelAtPeriodEnd);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(planName, tenantName, renewalType, startDate, endDate, isValid, paymentMethod, cancelAtPeriodEnd);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("class Subscription {\n");
+
+		sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");
+		sb.append("    planName: ").append(toIndentedString(planName)).append("\n");
+		sb.append("    renewalType: ").append(toIndentedString(renewalType)).append("\n");
+		sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
+		sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
+		sb.append("    isValid: ").append(toIndentedString(isValid)).append("\n");
+		sb.append("    paymentMethod: ").append(toIndentedString(paymentMethod)).append("\n");
+		sb.append("    cancelAtPeriodEnd: ").append(toIndentedString(cancelAtPeriodEnd)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
+	}
 }
-
-public void setTenantName(String tenantName) {
-	this.tenantName = tenantName;
-}
-
-  public Subscription renewalType(String renewalType) {
-    this.renewalType = renewalType;
-    return this;
-  }
-
-  /**
-   * This is the Renewal Type
-   * @return renewalType
-  **/
-  @ApiModelProperty(required = true, value = "This is the Renewal Type")
-  @NotNull
-
-
-  public String getRenewalType() {
-    return renewalType;
-  }
-
-  public void setRenewalType(String renewalType) {
-    this.renewalType = renewalType;
-  }
-
-  public Subscription startDate(String startDate) {
-    this.startDate = startDate;
-    return this;
-  }
-
-  /**
-   * This indicates the Start Date of Subscription
-   * @return startDate
-  **/
-  @ApiModelProperty(required = false, value = "This indicates the Start Date of Subscription")
-
-  public String getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(String startDate) {
-    this.startDate = startDate;
-  }
-
-  public Subscription endDate(String endDate) {
-    this.endDate = endDate;
-    return this;
-  }
-
-  /**
-   * This indicates the End Date of Subscription
-   * @return endDate
-  **/
-  @ApiModelProperty(required = false, value = "This indicates the End Date of Subscription")
-
-  public String getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(String endDate) {
-    this.endDate = endDate;
-  }
-
-  public Subscription isValid(String isValid) {
-    this.isValid = isValid;
-    return this;
-  }
-
-  /**
-   * This indicates whether the Current Subscription is Valid or Not
-   * @return isValid
-  **/
-  @ApiModelProperty(required = false, value = "This indicates whether the Current Subscription is Valid or Not")
-
-  public String getIsValid() {
-    return isValid;
-  }
-
-  public void setIsValid(String isValid) {
-    this.isValid = isValid;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Subscription subscription = (Subscription) o;
-    return Objects.equals(this.planName, subscription.planName) &&
-    	Objects.equals(this.tenantName, subscription.tenantName) &&
-        Objects.equals(this.renewalType, subscription.renewalType) &&
-        Objects.equals(this.startDate, subscription.startDate) &&
-        Objects.equals(this.endDate, subscription.endDate) &&
-        Objects.equals(this.isValid, subscription.isValid);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(planName, tenantName, renewalType, startDate, endDate, isValid);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Subscription {\n");
-    
-    sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");
-    sb.append("    planName: ").append(toIndentedString(planName)).append("\n");
-    sb.append("    renewalType: ").append(toIndentedString(renewalType)).append("\n");
-    sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
-    sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
-    sb.append("    isValid: ").append(toIndentedString(isValid)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
-}
-

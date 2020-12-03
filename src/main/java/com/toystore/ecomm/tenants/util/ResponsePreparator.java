@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -24,6 +25,7 @@ import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.model.Registrationresponse;
 import com.toystore.ecomm.tenants.model.Subscription;
 import com.toystore.ecomm.tenants.model.Subscriptionresponse;
+import com.toystore.ecomm.tenants.model.Views;
 
 @Component
 public class ResponsePreparator {
@@ -92,7 +94,8 @@ public class ResponsePreparator {
 					regObj.setTenantId(currentItem.getTenantId().toString());
 					regObj.setTenantName(currentItem.getTenantName());
 					regObj.setTenantUsername(currentItem.getTenantUsername());
-					regObj.setTenantPassword(PTMSConstants.PASSWORD_FIELD_VALUE);
+					//regObj.setTenantPassword(PTMSConstants.PASSWORD_FIELD_VALUE);
+					regObj.setTenantPassword(currentItem.getTenantPassword());
 					regObj.setTenantEmail(currentItem.getTenantEmail());
 					regObj.setTenantVerified(currentItem.getTenantVerified());
 					
@@ -124,7 +127,12 @@ public class ResponsePreparator {
         
         String regRespStr = null;
         try {
-        	regRespStr = mapper.writeValueAsString(registrationResponse);
+        	String loggedUserRole = (((SecurityContextHolder.getContext().getAuthentication().getAuthorities()).iterator().next()).getAuthority()).substring(5);
+        	
+        	if (PTMSConstants.TENANT_ADMIN_ROLE_NAME.equalsIgnoreCase(loggedUserRole) || PTMSConstants.PTMS_ADMIN_ROLE_NAME.equalsIgnoreCase(loggedUserRole))
+        		regRespStr = mapper.writerWithView(Views.Internal.class).writeValueAsString(registrationResponse);
+        	else
+        		regRespStr = mapper.writerWithView(Views.Public.class).writeValueAsString(registrationResponse);
         }
         catch (JsonProcessingException e) {
             e.printStackTrace();

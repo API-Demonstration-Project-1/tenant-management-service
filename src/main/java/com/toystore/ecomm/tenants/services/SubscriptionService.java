@@ -1,23 +1,20 @@
 package com.toystore.ecomm.tenants.services;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.toystore.ecomm.ptms.daorepo.model.RenewalTypeInfo;
 import com.toystore.ecomm.ptms.daorepo.model.SubscriptionInfo;
 import com.toystore.ecomm.ptms.daorepo.model.SubscriptionTypeInfo;
 import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.ptms.daorepo.repository.RenewalTypeRepository;
+import com.toystore.ecomm.ptms.daorepo.repository.SubscriptionRepository;
 import com.toystore.ecomm.ptms.daorepo.repository.SubscriptionTypeRepository;
 import com.toystore.ecomm.ptms.daorepo.repository.TenantRepository;
-import com.toystore.ecomm.ptms.daorepo.repository.SubscriptionRepository;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 
 @Service
@@ -34,50 +31,60 @@ public class SubscriptionService {
 	
 	@Autowired
 	private RenewalTypeRepository renewalTypeRepository;
-
+	
 	public void saveSubscriptionInfo(SubscriptionInfo subscriptionInfo) throws IllegalAccessException, InstantiationException {
-		subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
+		List<SubscriptionInfo> subscriptionInfoList = subscriptionRepository.findByTenantIdValidity(subscriptionInfo.getTenantId(), PTMSConstants.YES_VALUE.toLowerCase());
+		ListIterator<SubscriptionInfo> subscriptionInfoListIterator = subscriptionInfoList.listIterator();
 		
-		subscriptionInfo.setRenewalType(renewalTypeRepository.findById(subscriptionInfo.getRenewalTypeId()).get());
-		
-		Calendar cal = Calendar.getInstance();
-		if (PTMSConstants.SUBS_MONTHLY.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {				// MONTHLY
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.MONTH, +1);
-		} else if (PTMSConstants.SUBS_QUATERLY.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {		// QUATERLY
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.MONTH, +3);
-		} else if (PTMSConstants.SUBS_HALFYEARLY.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {	// HALF YEARLY
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.MONTH, +6);
-		} else if (PTMSConstants.SUBS_YEARLY.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {		// YEARLY
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.YEAR, +1);
-		} else if (PTMSConstants.SUBS_TWOYEARS.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {		// TWO YEARS
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.YEAR, +2);
-		} else if (PTMSConstants.SUBS_THREEYEARS.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {	// THREE YEARS
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.YEAR, +3);
-		} else if (PTMSConstants.SUBS_FIVEYEARS.equalsIgnoreCase(subscriptionInfo.getRenewalType().getRenewalName())) {		// FIVE YEARS
-			cal.setTime(subscriptionInfo.getStartDate());
-			cal.add(Calendar.YEAR, +5);
+		while (subscriptionInfoListIterator.hasNext()) {
+			SubscriptionInfo currentObj = subscriptionInfoListIterator.next();
+			currentObj.setIsValid(PTMSConstants.NO_VALUE);
+			
+			subscriptionRepository.save(currentObj);
 		}
 		
-		subscriptionInfo.setEndDate(cal.getTime());
+		//subscriptionInfoList.forEach(s -> subscriptionRepository.save(s.builder().isValid((PTMSConstants.NO_VALUE)).build()));
+		
+		subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
+		
+		
+		/*
+		 * subscriptionInfo.setRenewalType(renewalTypeRepository.findById(
+		 * subscriptionInfo.getRenewalTypeId()).get());
+		 * 
+		 * Calendar cal = Calendar.getInstance(); if
+		 * (PTMSConstants.SUBS_MONTHLY.equalsIgnoreCase(subscriptionInfo.getRenewalType(
+		 * ).getRenewalName())) { // MONTHLY
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.MONTH, +1); }
+		 * else if
+		 * (PTMSConstants.SUBS_QUATERLY.equalsIgnoreCase(subscriptionInfo.getRenewalType
+		 * ().getRenewalName())) { // QUATERLY
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.MONTH, +3); }
+		 * else if (PTMSConstants.SUBS_HALFYEARLY.equalsIgnoreCase(subscriptionInfo.
+		 * getRenewalType().getRenewalName())) { // HALF YEARLY
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.MONTH, +6); }
+		 * else if
+		 * (PTMSConstants.SUBS_YEARLY.equalsIgnoreCase(subscriptionInfo.getRenewalType()
+		 * .getRenewalName())) { // YEARLY cal.setTime(subscriptionInfo.getStartDate());
+		 * cal.add(Calendar.YEAR, +1); } else if
+		 * (PTMSConstants.SUBS_TWOYEARS.equalsIgnoreCase(subscriptionInfo.getRenewalType
+		 * ().getRenewalName())) { // TWO YEARS
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.YEAR, +2); }
+		 * else if (PTMSConstants.SUBS_THREEYEARS.equalsIgnoreCase(subscriptionInfo.
+		 * getRenewalType().getRenewalName())) { // THREE YEARS
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.YEAR, +3); }
+		 * else if (PTMSConstants.SUBS_FIVEYEARS.equalsIgnoreCase(subscriptionInfo.
+		 * getRenewalType().getRenewalName())) { // FIVE YEARS
+		 * cal.setTime(subscriptionInfo.getStartDate()); cal.add(Calendar.YEAR, +5); }
+		 * 
+		 * subscriptionInfo.setEndDate(cal.getTime());
+		 */
 		//subscriptionInfo.withId((new Random()).nextInt(1000));
-		
-		subscriptionInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-		
+	
 		subscriptionRepository.save(subscriptionInfo);
 	}
 	
 	public void updateSubscriptionInfo(SubscriptionInfo subscriptionInfo) {
-		subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-	    subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-	        
 		subscriptionRepository.save(subscriptionInfo);
 	}
 	
@@ -157,5 +164,13 @@ public class SubscriptionService {
 	
 	public void removeSubscription(Integer subscriptionId) {
 		subscriptionRepository.deleteById(subscriptionId);
+	}
+	
+	public SubscriptionTypeInfo getPlanType(String planName) {
+		return ((SubscriptionTypeInfo)(subscriptionTypeRepository.findByPlanName(planName)).get(0));
+	}
+	
+	public RenewalTypeInfo getRenewalType(String renewalName) {
+		return ((RenewalTypeInfo)(renewalTypeRepository.findByRenewalName(renewalName)).get(0));
 	}
 }

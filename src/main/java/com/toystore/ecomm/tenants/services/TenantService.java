@@ -1,6 +1,5 @@
 package com.toystore.ecomm.tenants.services;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,9 +42,6 @@ public class TenantService {
 		//tenantInfo.withId((new Random()).nextInt(1000));
 		tenantInfo.setTenantVerified(PTMSConstants.NO_VALUE);
     	tenantInfo.setTenantVerificationCode(RandomStringGenerator.getRandomAlphaNumericString(15));
-    	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-    	tenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-    	tenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
     	
     	// If new Tenant registration belongs to any existing Tenant or Org (check by Tenant Name) or Not
     	if (tenantRepository.findByTenantName(tenantInfo.getTenantName()).isEmpty()) {
@@ -59,34 +55,26 @@ public class TenantService {
 	}
 
 	public void updateTenantInfo(TenantInfo existingTenantInfo) {
-		existingTenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-		
 		tenantRepository.save(existingTenantInfo);
 	}
 	
 	@Transactional
-	public TenantInfo updateTenantInfoPostVerification(Integer tenantId) throws Exception {
+	public TenantInfo updateTenantInfoPostVerification(Integer tenantId, Integer customerId, Date subscriptionStartDate, Date subscriptionEndDate) throws Exception {
 		TenantInfo existingTenantInfo = tenantRepository.findByTenantId(tenantId);
 		
 		existingTenantInfo.setTenantVerified(PTMSConstants.YES_VALUE);
 		existingTenantInfo.setTenantVerificationCode(null);
-		existingTenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
+		existingTenantInfo.setCustomerId(customerId);
 		
-		// Create Community (Free) Subscription by default once Verification is confirmed
+		// Create Community (Free) Subscription (Trial) by default once Verification is confirmed
 		SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
         
-		//subscriptionInfo.withId((new Random()).nextInt(1000));
-		subscriptionInfo.setStartDate(new Date());
-		subscriptionInfo.setEndDate(new Date());
+		subscriptionInfo.setStartDate(subscriptionStartDate);
+		subscriptionInfo.setEndDate(subscriptionEndDate);
         subscriptionInfo.setTenantId(tenantId);
         subscriptionInfo.setPlanTypeId(PTMSConstants.FREE_SUBSCRIPTION_TYPE);
-        subscriptionInfo.setRenewalTypeId(PTMSConstants.MONTHLY_RENEWAL_TYPE);
+        //subscriptionInfo.setPlanType(subscriptionTypeRepository.findByPlanName("Trial").get(0));
         subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
-        subscriptionInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
         
         List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>(1);
 		subscriptionInfoList.add(subscriptionInfo);

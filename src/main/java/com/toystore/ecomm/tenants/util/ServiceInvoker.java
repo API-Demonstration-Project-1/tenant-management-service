@@ -1,7 +1,11 @@
 package com.toystore.ecomm.tenants.util;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,11 +31,11 @@ public class ServiceInvoker {
 	
 	public static ResponseEntity<String> invokeAuthServer(String url, String userName, String password) {
 		
-	    // Create Auth credentials
+	    // Create Auth Credentials
 	    String authStr = CLIENT_APP_USERNAME + PTMSConstants.COLON_SEPARATOR + CLIENT_APP_PASSWORD;
 	    String base64Creds = Base64.getEncoder().encodeToString(authStr.getBytes());
 
-	    // Create headers
+	    // Create Headers
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.add(AUTHORIZATION_HEADER, BASIC_TYPE_AUTH + PTMSConstants.SINGLE_SPACE + base64Creds);
 	    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -43,11 +47,38 @@ public class ServiceInvoker {
 	    map.add(LOGGED_USERNAME_PARAM, userName);
 	    map.add(LOGGED_PASSWORD_PARAM, password);
 	    
+	    // Set the Request Body
 	    HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
 	    
+	    // Hit the JWT-AUTH-SERVER to get the JWT Auth Token
 	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
 
 	    return responseEntity;
 	}
+	
+	public static ResponseEntity<String> invokePaymentService(String url, Map<String, Object> reqParams) {
+		HttpHeaders headers = new HttpHeaders();
+	    
+		// Set 'CONTENT-TYPE' Header
+		headers.setContentType(MediaType.APPLICATION_JSON);
+	    
+		// Set 'ACCEPT' Header
+	    List<MediaType> mediaTypeList = new ArrayList<MediaType>();
+	    mediaTypeList.add(MediaType.APPLICATION_JSON);
+	    headers.setAccept(mediaTypeList);
+	    
+	    // Set the REQUEST Body
+		JSONObject paramInObj = new JSONObject();
+		
+		reqParams.forEach((key,value) -> paramInObj.put(key, value));
+		
+		HttpEntity<String> requestEntity = new HttpEntity<String>(paramInObj.toString(), headers);
+		
+		// Hit the PAYMENT-SERVICE for Customer Creation in Stripe Payment Gateway
+	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+	    return responseEntity;
+	}
+	
 
 }

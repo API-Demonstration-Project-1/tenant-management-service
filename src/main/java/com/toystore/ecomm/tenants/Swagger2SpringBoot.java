@@ -6,11 +6,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
+import com.toystore.ecomm.ptms.daorepo.model.audit.AuditorAwareImpl;
+
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+//import com.toystore.ecomm.ptms.daorepo.model.audit
 
 @SpringBootApplication
 @EnableSwagger2
@@ -18,11 +25,18 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableResourceServer
 @EntityScan(basePackages = {"com.toystore.ecomm.ptms.daorepo.model"})
 @EnableJpaRepositories("com.toystore.ecomm.ptms.daorepo")
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @ComponentScan(basePackages = { "com.toystore.ecomm.tenants", "com.toystore.ecomm.tenants.controller" , 
 								"com.toystore.ecomm.tenants.config", "com.toystore.ecomm.tenants.exception",
-								"com.toystore.ecomm.tenants.model", "com.toystore.ecomm.ptms.daorepo.factory",
-								"com.toystore.ecomm.tenants.services", "com.toystore.ecomm.tenants.util"})
+								"com.toystore.ecomm.tenants.model", "com.toystore.ecomm.ptms.daorepo.factory", 
+								"com.toystore.ecomm.ptms.daorepo.model.audit", "com.toystore.ecomm.tenants.services", 
+								"com.toystore.ecomm.tenants.util" })
 public class Swagger2SpringBoot implements CommandLineRunner {
+
+	@Bean
+	public AuditorAware<String> auditorAware() {
+		return new AuditorAwareImpl();
+	}
 
     @Override
     public void run(String... arg0) throws Exception {

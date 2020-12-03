@@ -2,13 +2,16 @@ package com.toystore.ecomm.tenants.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,9 @@ import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Registration;
 import com.toystore.ecomm.tenants.services.NotificationServiceFacade;
 import com.toystore.ecomm.tenants.services.TenantService;
+import com.toystore.ecomm.tenants.util.DateFormatter;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
+import com.toystore.ecomm.tenants.util.ServiceInvoker;
 
 import io.swagger.annotations.ApiParam;
 
@@ -289,8 +294,60 @@ public class RegistrationApiController implements RegistrationApi {
     			if (tenantService.isTenantExisting(Integer.parseInt(tenantId))) {
 		    		if (!tenantService.isTenantVerified(Integer.parseInt(tenantId))) {
 				    	if (tenantService.isTenantRegistered(Integer.parseInt(tenantId), code)) {
-				    		TenantInfo updatedTenantInfo = tenantService.updateTenantInfoPostVerification(Integer.parseInt(tenantId));
+				    		TenantInfo tenantInfo = tenantService.getTenantInfoByTenantId(Integer.parseInt(tenantId));
 				    		
+				    		// Create 'Customer' in Stripe - START
+				    		Map<String, Object> reqParams = new HashMap<String, Object>(1);
+				    		reqParams.put("customerName", tenantInfo.getTenantName());
+				    		
+				    		ResponseEntity<String> paymentSrvcResp = ServiceInvoker.invokePaymentService("http://localhost:8083/payments/subscriptioncustomer", reqParams);
+				    		String respStr = paymentSrvcResp.getBody();
+							HttpStatus httpStatus = paymentSrvcResp.getStatusCode();
+							
+							if (httpStatus != HttpStatus.CREATED) {
+								log.error("registrationEmailverificationByTenantIdGET() - Error Response from Payment Service: " + respStr);
+								
+								String errorDesc = (new JSONObject(respStr)).getString(PTMSConstants.ERROR_DESC_FIELD);
+								String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + errorDesc, false, -1);
+
+						        return new ResponseEntity<String>(resp, httpStatus);
+							} 
+							
+							log.info("registrationEmailverificationByTenantIdGET() - Response from Payment Service: " + respStr);
+							
+							int customerId = (new JSONObject(respStr)).getJSONObject("data").getInt("id");
+							// Create 'Customer' in Stripe - END
+							
+							// Create 'Subscription' (Trial) in Stripe - START
+							
+							reqParams = new HashMap<String, Object>(6);
+					   		
+					   		reqParams.put("subscriptionCustomerId", customerId);
+					   		reqParams.put("planType", PTMSConstants.SUBS_TRIAL);
+					   		reqParams.put("renewalType", PTMSConstants.SUBS_TRIAL);
+					   		reqParams.put("trialDays", PTMSConstants.TRIAL_SUBSCRIPTION_DAYS);
+					   				
+					   		paymentSrvcResp = ServiceInvoker.invokePaymentService("http://localhost:8083/payments/subscriptionpayment", reqParams);
+					   		
+					   		httpStatus = paymentSrvcResp.getStatusCode();
+					   		JSONObject respJSONObj = new JSONObject(paymentSrvcResp.getBody());
+							
+							if (httpStatus != HttpStatus.CREATED) {
+								log.error("subscriptionPOST() - Error Response from Payment Service: " + paymentSrvcResp.getBody());
+								
+								String errorDesc = respJSONObj.getString(PTMSConstants.ERROR_DESC_FIELD);
+								String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + errorDesc, false, -1);
+
+						        return new ResponseEntity<String>(resp, httpStatus);
+							}
+							
+							String startDate = respJSONObj.getJSONObject("data").getString("startDate");
+				            String endDate = respJSONObj.getJSONObject("data").getString("endDate");
+				                
+							// Create 'Subscription' (Trial) in Stripe - END
+							
+							TenantInfo updatedTenantInfo = tenantService.updateTenantInfoPostVerification(Integer.parseInt(tenantId), customerId, DateFormatter.format(startDate), DateFormatter.format(endDate));
+							
 				    		//Notification for Post Verification Confirmation
 				    		if (isNotificationEnabled) {
 				    			notificationService.sendNotification(updatedTenantInfo, NotificationActions.POSTVERIFICATION);

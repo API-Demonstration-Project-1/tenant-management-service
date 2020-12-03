@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.toystore.ecomm.tenants.factory.UIModelFactory;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -26,21 +27,27 @@ public class Registration   {
 	  UIModelFactory.register("REGISTRATION", Registration.class);
   }
 	 
+  @JsonView(Views.Internal.class)
   @JsonProperty("tenantId")
   private String tenantId = null;
   
+  @JsonView(Views.Public.class)
   @JsonProperty("tenantName")
   private String tenantName = null;
 
+  @JsonView(Views.Public.class)
   @JsonProperty("tenantEmail")
   private String tenantEmail = null;
 
+  @JsonView(Views.Public.class)
   @JsonProperty("tenantUsername")
   private String tenantUsername = null;
 
+  @JsonView(Views.Internal.class)
   @JsonProperty("tenantPassword")
   private String tenantPassword = null;
 
+  @JsonView(Views.Public.class)
   @JsonProperty("tenantVerified")
   private String tenantVerified = null;
 
