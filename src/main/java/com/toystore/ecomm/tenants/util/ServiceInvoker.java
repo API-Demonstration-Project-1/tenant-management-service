@@ -80,5 +80,29 @@ public class ServiceInvoker {
 	    return responseEntity;
 	}
 	
+	public static ResponseEntity<String> invokeNotificationService(String url, Map<String, Object> reqParams) {
+		HttpHeaders headers = new HttpHeaders();
+	    
+		// Set 'CONTENT-TYPE' Header
+		headers.setContentType(MediaType.APPLICATION_JSON);
+	    
+		// Set 'ACCEPT' Header
+	    List<MediaType> mediaTypeList = new ArrayList<MediaType>();
+	    mediaTypeList.add(MediaType.APPLICATION_JSON);
+	    headers.setAccept(mediaTypeList);
+	    
+	    // Set the REQUEST Body
+		JSONObject paramInObj = new JSONObject();
+		
+		reqParams.forEach((key,value) -> paramInObj.put(key, value));
+		
+		HttpEntity<String> requestEntity = new HttpEntity<String>(paramInObj.toString(), headers);
+		
+		// Hit the PAYMENT-SERVICE for Customer Creation in Stripe Payment Gateway
+	    ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+	    return responseEntity;
+	}
+	
 
 }

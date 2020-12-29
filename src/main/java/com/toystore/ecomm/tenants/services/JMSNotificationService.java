@@ -11,9 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.ptms.daorepo.repository.TenantRepository;
-import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.util.JsonFormatter;
 
 @Service
@@ -23,9 +21,6 @@ public class JMSNotificationService {
 
 	@Autowired
 	private TenantRepository tenantRepository;
-	
-	@Autowired
-	private TenantService tenantService;
 	
 	@Transactional
 	@JmsListener(destination = "${activemq.notification.otpverification.outbound}")

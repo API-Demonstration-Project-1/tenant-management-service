@@ -312,17 +312,59 @@ public class RegistrationApiController implements RegistrationApi {
 				    	//if (tenantService.isTenantRegistered(Integer.parseInt(tenantId), code)) {
 				    		TenantInfo tenantInfo = tenantService.getTenantInfoByTenantId(Integer.parseInt(tenantId));
 				    		
-				    		// Verify the Verification Code - START
 				    		if (isNotificationEnabled) {
-			            		if (!isSyncNotificationType) {
+			            		if (!isSyncNotificationType) { // Use Messaging Queue (ActiveMQ)
+			            			// Verify the Verification Code - START
 			            			if (isOTPNotification) {
-			            				Map<String, String> elements = new HashMap<String, String>();
-			            			    elements.put("emailId", tenantInfo.getTenantEmail());
+			            				Map<String, String> elements = new HashMap<String, String>(2);
+			            			    
+			            				elements.put("emailId", tenantInfo.getTenantEmail());
 			            			    elements.put("code", code);
 			            			    
+			            			    // Send to the Queue
 			            			    otpVerificationConfirmationJmsTemplate.convertAndSend(JsonFormatter.convertMapToJson(elements));
-			            			} else {}
+			            			    
+			            			    
+			            			} else {
+			            				
+			            			}
+			            			
+			            			log.info("registrationEmailverificationByTenantIdGET() exited");
+						    		
+						    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is being Verified, will be updated about the same later", true, null);
+						    		
+						    		return new ResponseEntity<String>(resp, HttpStatus.OK);
+			            			// Verify the Verification Code - END
 			            		} else {
+			            			// Verify the Verification Code - START
+			            			if (isOTPNotification) {
+			            				Map<String, Object> reqParams = new HashMap<String, Object>(2);
+			            				
+			            				reqParams.put("emailId", tenantInfo.getTenantEmail());
+			            				reqParams.put("code", code);
+			            				 
+			            				ResponseEntity<String> notificationSrvcResp = ServiceInvoker.invokeNotificationService("http://localhost:8085/pnms/otpverificationcheck", reqParams);
+			            		   		
+			            		   		HttpStatus httpStatus = notificationSrvcResp.getStatusCode();
+			            		   		JSONObject respJSONObj = new JSONObject(notificationSrvcResp.getBody());
+			            				
+			            				if (httpStatus != HttpStatus.CREATED) {
+			            					log.error("registrationPOST() - Error Response from Notification Service: " + notificationSrvcResp.getBody());
+			            					
+			            					String errorDesc = respJSONObj.getString(PTMSConstants.ERROR_DESC_FIELD);
+			            					String resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + errorDesc, false, -1);
+
+			            			        return new ResponseEntity<String>(resp, httpStatus);
+			            				}
+			            				
+			            			} else {
+			            				
+			            			}
+			            			
+			            			tenantInfo.setTenantVerified(PTMSConstants.YES_VALUE);
+			            			
+			            			// Verify the Verification Code - END
+			            			
 			            			// Create 'Customer' in Stripe - START
 						    		Map<String, Object> reqParams = new HashMap<String, Object>(1);
 						    		reqParams.put("customerName", tenantInfo.getTenantName());
@@ -374,22 +416,30 @@ public class RegistrationApiController implements RegistrationApi {
 									// Create 'Subscription' (Trial) in Stripe - END
 									
 									TenantInfo updatedTenantInfo = tenantService.updateTenantInfoPostVerification(Integer.parseInt(tenantId), customerId, DateFormatter.format(startDate), DateFormatter.format(endDate));
+									
+									log.trace("Updated Tenant:" + updatedTenantInfo);
+									
+									log.info("registrationEmailverificationByTenantIdGET() exited");
+						    		
+						    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Verified", true, null);
+						    		
+						    		return new ResponseEntity<String>(resp, HttpStatus.OK);
 			            		}
 				    		}
-				    		// Verify the Verification Code - END
 				    		
 				    		
+				    		log.info("registrationEmailverificationByTenantIdGET() exited");
+				    		
+				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "No Notification Enabled", false, -1);
+				    		
+				    		return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 							
 				    		//Notification for Post Verification Confirmation
 				    		/*if (isNotificationEnabled) {
 				    			notificationService.sendNotification(updatedTenantInfo, NotificationActions.POSTVERIFICATION);
 				    		}*/
 				    		
-				    		log.info("registrationEmailverificationByTenantIdGET() exited");
 				    		
-				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Registration is Verified", true, null);
-				    		
-				    		return new ResponseEntity<String>(resp, HttpStatus.OK);
 				    	/*} else {
 				    		log.info("registrationEmailverificationByTenantIdGET() exited");
 				    		
@@ -575,18 +625,16 @@ public class RegistrationApiController implements RegistrationApi {
             	TenantInfo tenantInfo = (TenantInfo)POJOFactory.getInstance("TENANTINFO");
             	tenantInfo.setTenantName(body.getTenantName());
             	tenantInfo.setTenantEmail(body.getTenantEmail());
-            	tenantInfo.setTenantMobile("+919845488701");
+            	tenantInfo.setTenantMobile(body.getTenantMobile());
             	tenantInfo.setTenantUsername(body.getTenantUsername());
             	tenantInfo.setTenantPassword(body.getTenantPassword());
-            	
-            	tenantInfo = tenantService.saveTenantInfo(tenantInfo);
             	
             	log.trace("Created Tenant Info POJO: " + tenantInfo);
             	
             	if (isNotificationEnabled) {
-            		if (!isSyncNotificationType) {
+            		if (!isSyncNotificationType) { // Use Messaging Queue (ActiveMQ)
             			if (isOTPNotification) {
-            				Map<String, String> elements = new HashMap<String, String>();
+            				Map<String, String> elements = new HashMap<String, String>(3);
             			    
             				elements.put("tenantId", tenantInfo.getTenantId().toString());
             			    elements.put("mobileNum", tenantInfo.getTenantMobile());
@@ -594,7 +642,32 @@ public class RegistrationApiController implements RegistrationApi {
             			    
             			    otpVerificationJmsTemplate.convertAndSend(JsonFormatter.convertMapToJson(elements));
             			}
+            		} else { // Use API
+            			if (isOTPNotification) {
+            				Map<String, Object> reqParams = new HashMap<String, Object>(2);
+            				
+            				reqParams.put("mobileNum", tenantInfo.getTenantMobile());
+            				reqParams.put("emailId", tenantInfo.getTenantEmail());
+            				
+            				ResponseEntity<String> notificationSrvcResp = ServiceInvoker.invokeNotificationService("http://localhost:8085/pnms/otpverification", reqParams);
+            		   		
+            		   		HttpStatus httpStatus = notificationSrvcResp.getStatusCode();
+            		   		JSONObject respJSONObj = new JSONObject(notificationSrvcResp.getBody());
+            				
+            				if (httpStatus != HttpStatus.CREATED) {
+            					log.error("registrationPOST() - Error Response from Notification Service: " + notificationSrvcResp.getBody());
+            					
+            					String errorDesc = respJSONObj.getString(PTMSConstants.ERROR_DESC_FIELD);
+            					String resp = ResponsePreparator.prepareRegistrationResponse(null, "Error - " + errorDesc, false, -1);
+
+            			        return new ResponseEntity<String>(resp, httpStatus);
+            				}
+            				
+            				tenantInfo.setVerificationId(respJSONObj.getJSONObject("data").getString("id"));
+            			}
             		}
+            		
+            		tenantInfo = tenantService.saveTenantInfo(tenantInfo);
             	
 	            	//Notification for Welcome Message & Registration Verification
 	            	//notificationService.sendNotification(tenantInfo, NotificationActions.WELCOME);

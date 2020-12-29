@@ -18,6 +18,7 @@ public class PTMSConstants {
 	public static final int FREE_SUBSCRIPTION_TYPE = 1;
 	
 	public static final int MONTHLY_RENEWAL_TYPE = 1;
+	public static final int NO_RENEWAL_TYPE = 8;
 	
 	public static final String TENANT_ADMIN_ROLE_NAME = "TENANT_ADMIN";
 	public static final String TENANT_USER_ROLE_NAME = "TENANT_USER";

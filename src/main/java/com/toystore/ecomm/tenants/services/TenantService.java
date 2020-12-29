@@ -80,6 +80,7 @@ public class TenantService {
 		subscriptionInfo.setEndDate(subscriptionEndDate);
         subscriptionInfo.setTenantId(tenantId);
         subscriptionInfo.setPlanTypeId(PTMSConstants.FREE_SUBSCRIPTION_TYPE);
+        subscriptionInfo.setRenewalTypeId(PTMSConstants.NO_RENEWAL_TYPE);
         //subscriptionInfo.setPlanType(subscriptionTypeRepository.findByPlanName("Trial").get(0));
         subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
         
