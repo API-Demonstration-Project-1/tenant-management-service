@@ -66,7 +66,7 @@ public class TenantService {
 	}
 	
 	@Transactional
-	public TenantInfo updateTenantInfoPostVerification(Integer tenantId, Integer customerId, Date subscriptionStartDate, Date subscriptionEndDate) throws Exception {
+	public TenantInfo updateTenantInfoPostVerification(Integer tenantId, Integer customerId, Date subscriptionStartDate, Date subscriptionEndDate) throws IllegalAccessException, InstantiationException {
 		TenantInfo existingTenantInfo = tenantRepository.findByTenantId(tenantId);
 		
 		existingTenantInfo.setTenantVerified(PTMSConstants.YES_VALUE);
