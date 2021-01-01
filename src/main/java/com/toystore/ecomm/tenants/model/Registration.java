@@ -1,18 +1,34 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Registration
  */
+@Component
+
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Registration   {
+
+  static {
+	  UIModelFactory.register("REGISTRATION", Registration.class);
+  }
+	 
+  @JsonProperty("tenantId")
+  private String tenantId = null;
+  
   @JsonProperty("tenantName")
   private String tenantName = null;
 
@@ -28,10 +44,19 @@ public class Registration   {
   @JsonProperty("tenantVerified")
   private String tenantVerified = null;
 
-  public Registration tenantName(String tenantName) {
-    this.tenantName = tenantName;
-    return this;
-  }
+  public String getTenantId() {
+	return tenantId;
+}
+
+  	@ApiModelProperty(required = false, value = "This is the ID of the Tenant")
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
+	
+	public Registration tenantName(String tenantName) {
+	    this.tenantName = tenantName;
+	    return this;
+	}
 
   /**
    * This is unique name for each tenant
@@ -123,6 +148,7 @@ public class Registration   {
   **/
   @ApiModelProperty(required = false, value = "This indicates whether Tenant Registration is verified or not")
 
+
   public String getTenantVerified() {
     return tenantVerified;
   }
@@ -141,7 +167,8 @@ public class Registration   {
       return false;
     }
     Registration registration = (Registration) o;
-    return Objects.equals(this.tenantName, registration.tenantName) &&
+    return Objects.equals(this.tenantId, registration.tenantId) &&
+    	Objects.equals(this.tenantName, registration.tenantName) &&
         Objects.equals(this.tenantEmail, registration.tenantEmail) &&
         Objects.equals(this.tenantUsername, registration.tenantUsername) &&
         Objects.equals(this.tenantPassword, registration.tenantPassword) &&
@@ -158,6 +185,7 @@ public class Registration   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Registration {\n");
     
+    sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
     sb.append("    tenantName: ").append(toIndentedString(tenantName)).append("\n");
     sb.append("    tenantEmail: ").append(toIndentedString(tenantEmail)).append("\n");
     sb.append("    tenantUsername: ").append(toIndentedString(tenantUsername)).append("\n");

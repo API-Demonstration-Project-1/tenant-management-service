@@ -1,18 +1,31 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Login
  */
+@Component
+
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Login   {
+
+	  static {
+		  UIModelFactory.register("LOGIN", Login.class);
+	  }
+  
   @JsonProperty("userName")
   private String userName = null;
 

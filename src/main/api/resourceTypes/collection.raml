@@ -1,0 +1,12 @@
+#%RAML 1.0 ResourceType
+
+usage: Use this resourceType to represent a collection of items
+description: Collection of available <<resourcePathName|!uppercamelcase>>
+
+post:
+  description: Add a new <<resourcePathName|!uppercamelcase|!singularize>>
+  is: [ hasRequestItemWithResponseMessage ]
+
+get:
+  description: Get a list of <<resourcePathName|!uppercamelcase>>
+  is: [ hasResponseCollection ]

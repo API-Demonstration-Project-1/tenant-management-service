@@ -1,0 +1,11 @@
+
+#%RAML 1.0 Trait
+
+usage: Use this trait for resources that could respond with a 403 status
+
+responses:
+  400:
+    body:
+      application/json:
+        type: !include ..\types\Error.raml
+        example: !include ../examples/Forbidden.json

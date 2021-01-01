@@ -1,20 +1,64 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Loginresponse
  */
+@Component
+
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-25T11:20:36.509Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Loginresponse   {
+
+  static {
+	  UIModelFactory.register("LOGINRESP", Loginresponse.class);
+  }
+  
+  @JsonProperty("success")
+  private Boolean success = null;
+
   @JsonProperty("message")
   private String message = null;
+
+  @JsonProperty("data")
+  private Data2 data = null;
+
+  @JsonProperty("error_code")
+  private Integer errorCode = null;
+
+  public Loginresponse success(Boolean success) {
+    this.success = success;
+    return this;
+  }
+
+  /**
+   * Get success
+   * @return success
+  **/
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+
+  public Boolean isSuccess() {
+    return success;
+  }
+
+  public void setSuccess(Boolean success) {
+    this.success = success;
+  }
 
   public Loginresponse message(String message) {
     this.message = message;
@@ -37,6 +81,49 @@ public class Loginresponse   {
     this.message = message;
   }
 
+  public Loginresponse data(Data2 data) {
+    this.data = data;
+    return this;
+  }
+
+  /**
+   * Get data
+   * @return data
+  **/
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+  @Valid
+
+  public Data2 getData() {
+    return data;
+  }
+
+  public void setData(Data2 data) {
+    this.data = data;
+  }
+
+  public Loginresponse errorCode(Integer errorCode) {
+    this.errorCode = errorCode;
+    return this;
+  }
+
+  /**
+   * Get errorCode
+   * @return errorCode
+  **/
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+
+  public Integer getErrorCode() {
+    return errorCode;
+  }
+
+  public void setErrorCode(Integer errorCode) {
+    this.errorCode = errorCode;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -47,12 +134,15 @@ public class Loginresponse   {
       return false;
     }
     Loginresponse loginresponse = (Loginresponse) o;
-    return Objects.equals(this.message, loginresponse.message);
+    return Objects.equals(this.success, loginresponse.success) &&
+        Objects.equals(this.message, loginresponse.message) &&
+        Objects.equals(this.data, loginresponse.data) &&
+        Objects.equals(this.errorCode, loginresponse.errorCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(message);
+    return Objects.hash(success, message, data, errorCode);
   }
 
   @Override
@@ -60,7 +150,10 @@ public class Loginresponse   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Loginresponse {\n");
     
+    sb.append("    success: ").append(toIndentedString(success)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    data: ").append(toIndentedString(data)).append("\n");
+    sb.append("    errorCode: ").append(toIndentedString(errorCode)).append("\n");
     sb.append("}");
     return sb.toString();
   }

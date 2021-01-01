@@ -1,0 +1,3 @@
+"<h1><center>PTMS - Registration Verification</center></h1><br>"
+ + 
+ "<h2>To confirm your account, please click " + "<a href=https://localhost:8080/ptms/registration/" + tenantId + "/emailverification?code=" + verificationCode + ">here</a></h2>

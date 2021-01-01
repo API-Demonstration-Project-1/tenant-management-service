@@ -1,0 +1,19 @@
+#%RAML 1.0 DataType
+
+properties:
+  message:
+    description: This is the Verification-related message
+    required: true
+    type: string
+  success:
+    description: True or False
+    required: true
+    type: boolean
+  data:
+    description: This is any data
+    required: false
+    type: object
+  errorCode:
+    description: This is gives error code info
+    required: false
+    type: integer
