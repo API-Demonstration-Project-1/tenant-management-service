@@ -18,6 +18,7 @@ public class PTMSConstants {
 	public static final int FREE_SUBSCRIPTION_TYPE = 1;
 	
 	public static final int MONTHLY_RENEWAL_TYPE = 1;
+	public static final int NO_RENEWAL_TYPE = 8;
 	
 	public static final String TENANT_ADMIN_ROLE_NAME = "TENANT_ADMIN";
 	public static final String TENANT_USER_ROLE_NAME = "TENANT_USER";
@@ -35,7 +36,7 @@ public class PTMSConstants {
 	public static final String WELCOME_TEMPLATE_KEY = "welcome-template";
 	public static final String POSTVERIFICATION_TEMPLATE_KEY = "postverification-template";
 	
-	// Subscription Renewal Types
+	// Subscription Plan/Renewal Types
 	public static final String SUBS_MONTHLY = "Monthly";
 	public static final String SUBS_QUATERLY = "Quaterly";
 	public static final String SUBS_HALFYEARLY = "HalfYearly";
@@ -44,5 +45,11 @@ public class PTMSConstants {
 	public static final String SUBS_THREEYEARS = "3Years";
 	public static final String SUBS_FIVEYEARS = "5Years";
 	
+	public static final String SUBS_TRIAL = "Trial";
+	
+	public static final int TRIAL_SUBSCRIPTION_DAYS = 15;
+	
 	public static final String SUBS_DATE_PATTERN = "dd-MM-yyyy";
+	
+	public static final String SUBS_TS_PATTERN = "EEE MMM dd HH:mm:ss Z yyyy";
 }

@@ -1,6 +1,5 @@
 package com.toystore.ecomm.tenants.services;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +15,6 @@ import com.toystore.ecomm.ptms.daorepo.model.TenantDBInfo;
 import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.ptms.daorepo.repository.TenantRepository;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
-import com.toystore.ecomm.tenants.util.RandomStringGenerator;
 
 @Service
 public class TenantService {
@@ -38,14 +36,11 @@ public class TenantService {
 	 * String password) { return
 	 * tenantRepository.findByTenantUsernameAndPassword(userName, password); }
 	 */
-
+	
 	public TenantInfo saveTenantInfo(TenantInfo tenantInfo) {
 		//tenantInfo.withId((new Random()).nextInt(1000));
 		tenantInfo.setTenantVerified(PTMSConstants.NO_VALUE);
-    	tenantInfo.setTenantVerificationCode(RandomStringGenerator.getRandomAlphaNumericString(15));
-    	tenantInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-    	tenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-    	tenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
+    	//tenantInfo.setTenantVerificationCode(RandomStringGenerator.getRandomAlphaNumericString(15));
     	
     	// If new Tenant registration belongs to any existing Tenant or Org (check by Tenant Name) or Not
     	if (tenantRepository.findByTenantName(tenantInfo.getTenantName()).isEmpty()) {
@@ -59,34 +54,35 @@ public class TenantService {
 	}
 
 	public void updateTenantInfo(TenantInfo existingTenantInfo) {
-		existingTenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
-		
 		tenantRepository.save(existingTenantInfo);
 	}
 	
+	public TenantInfo updateTenantVerification(Integer tenantId, String verificationId) {
+		TenantInfo existingTenant = tenantRepository.findByTenantId(tenantId);
+		
+		existingTenant.setVerificationId(verificationId);
+		
+		return tenantRepository.save(existingTenant);
+	}
+	
 	@Transactional
-	public TenantInfo updateTenantInfoPostVerification(Integer tenantId) throws Exception {
+	public TenantInfo updateTenantInfoPostVerification(Integer tenantId, Integer customerId, Date subscriptionStartDate, Date subscriptionEndDate) throws IllegalAccessException, InstantiationException {
 		TenantInfo existingTenantInfo = tenantRepository.findByTenantId(tenantId);
 		
 		existingTenantInfo.setTenantVerified(PTMSConstants.YES_VALUE);
-		existingTenantInfo.setTenantVerificationCode(null);
-		existingTenantInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-		existingTenantInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
+		//existingTenantInfo.setTenantVerificationCode(null);
+		existingTenantInfo.setCustomerId(customerId);
 		
-		// Create Community (Free) Subscription by default once Verification is confirmed
+		// Create Community (Free) Subscription (Trial) by default once Verification is confirmed
 		SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
         
-		//subscriptionInfo.withId((new Random()).nextInt(1000));
-		subscriptionInfo.setStartDate(new Date());
-		subscriptionInfo.setEndDate(new Date());
+		subscriptionInfo.setStartDate(subscriptionStartDate);
+		subscriptionInfo.setEndDate(subscriptionEndDate);
         subscriptionInfo.setTenantId(tenantId);
         subscriptionInfo.setPlanTypeId(PTMSConstants.FREE_SUBSCRIPTION_TYPE);
-        subscriptionInfo.setRenewalTypeId(PTMSConstants.MONTHLY_RENEWAL_TYPE);
+        subscriptionInfo.setRenewalTypeId(PTMSConstants.NO_RENEWAL_TYPE);
+        //subscriptionInfo.setPlanType(subscriptionTypeRepository.findByPlanName("Trial").get(0));
         subscriptionInfo.setIsValid(PTMSConstants.YES_VALUE);
-        subscriptionInfo.setCreatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setLastUpdatedTS(new Timestamp((new Date()).getTime()));
-        subscriptionInfo.setCreatedBy(PTMSConstants.SERVICE_NAME);
         
         List<SubscriptionInfo> subscriptionInfoList = new ArrayList<SubscriptionInfo>(1);
 		subscriptionInfoList.add(subscriptionInfo);
@@ -123,12 +119,15 @@ public class TenantService {
 		return ((tenantRepository.findByTenantEmail(tenantEmail).size()) > 0) ? false : true;
 	}
 	
-	public boolean isTenantRegistered(Integer tenantId, String code) {
-		
-		TenantInfo tenantInfo = null;
-		
-		return ((tenantInfo = tenantRepository.findByTenantId(tenantId)) == null ? false : ((tenantInfo.getTenantVerificationCode()).equals(code) ? true : false));
-	}
+	/*
+	 * public boolean isTenantRegistered(Integer tenantId, String code) {
+	 * 
+	 * TenantInfo tenantInfo = null;
+	 * 
+	 * return ((tenantInfo = tenantRepository.findByTenantId(tenantId)) == null ?
+	 * false : ((tenantInfo.getTenantVerificationCode()).equals(code) ? true :
+	 * false)); }
+	 */
 	
 	public boolean isTenantVerified(Integer tenantId) {
 		TenantInfo tenantInfo = null;

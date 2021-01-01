@@ -72,7 +72,7 @@ public class EmailService {
             			ctx = new Context();
 	                    ctx.setVariable("name", tenantInfo.getTenantName());
 	                    ctx.setVariable("tenantId", tenantInfo.getTenantId());
-	                    ctx.setVariable("verificationCode", tenantInfo.getTenantVerificationCode());
+	                    //ctx.setVariable("verificationCode", tenantInfo.getTenantVerificationCode());
 	                    
 	                    message.setSubject(regWelcomeSubject);
 	

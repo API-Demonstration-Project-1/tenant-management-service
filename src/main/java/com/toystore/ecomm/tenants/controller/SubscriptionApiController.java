@@ -1,16 +1,16 @@
 package com.toystore.ecomm.tenants.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.toystore.ecomm.ptms.daorepo.factory.POJOFactory;
 import com.toystore.ecomm.ptms.daorepo.model.SubscriptionInfo;
+import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
 import com.toystore.ecomm.tenants.constants.PTMSConstants;
 import com.toystore.ecomm.tenants.model.Subscription;
 import com.toystore.ecomm.tenants.services.SubscriptionService;
 import com.toystore.ecomm.tenants.services.TenantService;
+import com.toystore.ecomm.tenants.util.DateFormatter;
 import com.toystore.ecomm.tenants.util.ResponsePreparator;
+import com.toystore.ecomm.tenants.util.ServiceInvoker;
 
 import io.swagger.annotations.ApiParam;
 
@@ -424,42 +427,59 @@ public class SubscriptionApiController implements SubscriptionApi {
             try {
             	/* Extract Logged User Info - Username - START */
             	
-		   		 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		   		 Object principal = authentication.getPrincipal();
+		   		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		   		Object principal = authentication.getPrincipal();
 		   		 
-		   		 String tenantUsername = null;
+		   		String tenantUsername = null;
 		   		 
-		   		 if (principal instanceof UserDetails) {
-		   			 tenantUsername = ((UserDetails)principal).getUsername();
-		   		 } else {
-		   			 tenantUsername = principal.toString();
-		   		 }
+		   		if (principal instanceof UserDetails) {
+		   			tenantUsername = ((UserDetails)principal).getUsername();
+		   		} else {
+		   			tenantUsername = principal.toString();
+		   		}
 		   		 
-		   		 /* Extract Logged User Info - Username - END */
-		   		 
+		   		/* Extract Logged User Info - Username - END */
+		   		
+		   		TenantInfo tenantInfo = tenantService.getTenantInfoByUsername(tenantUsername);
+		   		
+				Map<String, Object> reqParams = new HashMap<String, Object>(6);
+		   		
+		   		reqParams.put("subscriptionCustomerId", tenantInfo.getCustomerId());
+		   		reqParams.put("planType", body.getPlanName());
+		   		reqParams.put("renewalType", body.getRenewalType());
+		   		
+		   		if (body.getCardToken() != null && !PTMSConstants.BLANK_STRING.equalsIgnoreCase(body.getCardToken())) {
+		   			reqParams.put("paymentMethod", "card");
+		   			reqParams.put("cardToken", body.getCardToken());
+		   		}
+		   		
+		   		reqParams.put("cancelAtPeriodEnd", body.getCancelAtPeriodEnd());
+		   				
+		   		ResponseEntity<String> paymentSrvcResp = ServiceInvoker.invokePaymentService("http://localhost:8083/payments/subscriptionpayment", reqParams);
+		   		
+		   		HttpStatus httpStatus = paymentSrvcResp.getStatusCode();
+		   		JSONObject respJSONObj = new JSONObject(paymentSrvcResp.getBody());
+				
+				if (httpStatus != HttpStatus.CREATED) {
+					log.error("subscriptionPOST() - Error Response from Payment Service: " + paymentSrvcResp.getBody());
+					
+					String errorDesc = respJSONObj.getString(PTMSConstants.ERROR_DESC_FIELD);
+					String resp = ResponsePreparator.prepareLoginResponse(null, "Error - " + errorDesc, false, -1);
+
+			        return new ResponseEntity<String>(resp, httpStatus);
+				}
+				
                 SubscriptionInfo subscriptionInfo = (SubscriptionInfo)POJOFactory.getInstance("SUBSCRIPTIONINFO");
                 
-                subscriptionInfo.setTenantId(tenantService.getTenantInfoByUsername(tenantUsername).getTenantId());
-                subscriptionInfo.setPlanTypeId(Integer.parseInt(body.getPlanName()));
-                subscriptionInfo.setRenewalTypeId(Integer.parseInt(body.getRenewalType()));
+                subscriptionInfo.setTenantId(tenantInfo.getTenantId());
+                subscriptionInfo.setPlanTypeId(subscriptionService.getPlanType(body.getPlanName()).getPlanTypeId());
+                subscriptionInfo.setRenewalTypeId(subscriptionService.getRenewalType(body.getRenewalType()).getRenewalTypeId());
                 
-                if (body.getStartDate() != null && !PTMSConstants.BLANK_STRING.equals(body.getStartDate())) {
-                	SimpleDateFormat sdf = new SimpleDateFormat(PTMSConstants.SUBS_DATE_PATTERN);
-                	
-                	try {
-                		subscriptionInfo.setStartDate(sdf.parse(body.getStartDate()));
-                	} catch (ParseException pe) {
-                		log.info("subscriptionPOST() exited with Errors");
-                		
-                		String resp = ResponsePreparator.prepareSubscriptionResponse(null, "Date Format is not correct. Please enter in this format: 'dd-MM-yyyy'", false, -1);
-                        
-                        return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
-                	}
-                } else {
-                	subscriptionInfo.setStartDate(new Date());
-                }
+                subscriptionInfo.setStartDate(DateFormatter.format(respJSONObj.getJSONObject("data").getString("startDate")));
+                subscriptionInfo.setEndDate(DateFormatter.format(respJSONObj.getJSONObject("data").getString("endDate")));
                 
                 subscriptionService.saveSubscriptionInfo(subscriptionInfo);
+                
                 log.trace("Created Subscription Info POJO: " + subscriptionInfo);
                 
                 String resp = ResponsePreparator.prepareSubscriptionResponse(subscriptionInfo.getSubscriptionId(), "The Subscription has been created Successfully", true, null);
