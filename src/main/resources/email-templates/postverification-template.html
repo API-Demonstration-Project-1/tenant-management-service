@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title data-th-remove="all">PTMS Registration Welcome Template</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <div style="background-color: #ccc; background-image: url(images/background.png)"
+             data-th-style="|background-color: #ccc; background-image: url(cid:background)|">
+            <div style="padding: 40px;">
+                <div style="margin-left: auto; margin-right: auto; min-width: 320px; border: solid 1px #555; border-radius: 6px;">
+                    <div style="background-color: #555; padding: 4px 4px 2px 4px;">
+                        <div style="background-image: url(images/logo-background.png);"
+                             data-th-style="|background-image: url(cid:logo-background)|">
+                            <img style="border: solid 1px #555; border-radius: 6px;"
+                                 src="images/thymeleaf-banner.png" data-th-src="|cid:thymeleaf-banner|" />
+                        </div>
+                    </div>
+                    <div style="padding: 15px 15px 30px 15px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size:1em; background-color: #fff; color:#333;">
+                    	<h1><center>PTMS - Registration Verification Confirmation</center></h1>
+                    	<br>
+                        <p>Hello <b data-th-text="${name}"></b>!</p>
+                        <p>
+                            This is to confirm that your Registration has been successfully verified.
+                        </p>
+                        <p></p>
+                        
+                        <p>
+                        
+                            Regards, <br />
+                            <em>The Proarchs Team</em>
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

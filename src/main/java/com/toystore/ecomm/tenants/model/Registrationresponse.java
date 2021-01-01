@@ -1,22 +1,32 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import com.toystore.ecomm.tenants.model.Data;
-import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Registrationresponse
  */
+@Component
+
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Registrationresponse   {
+	
+  static {
+	  UIModelFactory.register("REGISTRATIONRESP", Registrationresponse.class);
+  }
+	
   @JsonProperty("success")
   private Boolean success = null;
 
@@ -25,6 +35,9 @@ public class Registrationresponse   {
 
   @JsonProperty("data")
   private Data data = null;
+  
+  @JsonProperty("resp_data")
+  private Data3 data3 = null;
 
   @JsonProperty("error_code")
   private Integer errorCode = null;
@@ -80,17 +93,30 @@ public class Registrationresponse   {
    * Get data
    * @return data
   **/
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
-
+  @ApiModelProperty(required = false, value = "")
   @Valid
-
   public Data getData() {
     return data;
   }
 
   public void setData(Data data) {
     this.data = data;
+  }
+  
+  public Registrationresponse data3(Data3 data3) {
+	    this.data3 = data3;
+	    return this;
+  }
+
+
+  @ApiModelProperty(required = false, value = "")
+  @Valid
+  public Data3 getData3() {
+	return data3;
+  }
+
+  public void setData3(Data3 data3) {
+	this.data3 = data3;
   }
 
   public Registrationresponse errorCode(Integer errorCode) {
@@ -127,6 +153,7 @@ public class Registrationresponse   {
     return Objects.equals(this.success, registrationresponse.success) &&
         Objects.equals(this.message, registrationresponse.message) &&
         Objects.equals(this.data, registrationresponse.data) &&
+        Objects.equals(this.data3, registrationresponse.data3) &&
         Objects.equals(this.errorCode, registrationresponse.errorCode);
   }
 
@@ -143,6 +170,7 @@ public class Registrationresponse   {
     sb.append("    success: ").append(toIndentedString(success)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("    data: ").append(toIndentedString(data)).append("\n");
+    sb.append("    data3: ").append(toIndentedString(data3)).append("\n");
     sb.append("    errorCode: ").append(toIndentedString(errorCode)).append("\n");
     sb.append("}");
     return sb.toString();

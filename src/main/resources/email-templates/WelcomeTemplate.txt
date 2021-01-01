@@ -1,0 +1,3 @@
+"<h1><center>WELCOME TO PTMS - Proarchs Tenant Management Service</center></h1><br>"
+ + 
+ "<h3>There is lot to explore here. Just wait & watch. For now, please confirm your Registration via Email Verification sent to your Registered Email.</h3>"

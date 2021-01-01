@@ -1,21 +1,31 @@
 package com.toystore.ecomm.tenants.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.toystore.ecomm.tenants.factory.UIModelFactory;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Subscription
  */
+@Component
+
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-30T07:36:17.215Z")
 
 public class Subscription   {
+
+  static {
+	  UIModelFactory.register("SUBSCRIPTION", Subscription.class);
+  }
+	 
   @JsonProperty("planName")
   private String planName = null;
   
@@ -64,8 +74,7 @@ public class Subscription   {
   * This is the Tenant Name
   * @return tenantName
  **/
- @ApiModelProperty(required = true, value = "This is the Tenant Name")
- @NotNull
+ @ApiModelProperty(required = false, value = "This is the Tenant Name")
 
   public String getTenantName() {
 	return tenantName;
@@ -105,9 +114,7 @@ public void setTenantName(String tenantName) {
    * This indicates the Start Date of Subscription
    * @return startDate
   **/
-  @ApiModelProperty(required = true, value = "This indicates the Start Date of Subscription")
-  @NotNull
-
+  @ApiModelProperty(required = false, value = "This indicates the Start Date of Subscription")
 
   public String getStartDate() {
     return startDate;
@@ -126,9 +133,7 @@ public void setTenantName(String tenantName) {
    * This indicates the End Date of Subscription
    * @return endDate
   **/
-  @ApiModelProperty(required = true, value = "This indicates the End Date of Subscription")
-  @NotNull
-
+  @ApiModelProperty(required = false, value = "This indicates the End Date of Subscription")
 
   public String getEndDate() {
     return endDate;
@@ -147,9 +152,7 @@ public void setTenantName(String tenantName) {
    * This indicates whether the Current Subscription is Valid or Not
    * @return isValid
   **/
-  @ApiModelProperty(required = true, value = "This indicates whether the Current Subscription is Valid or Not")
-  @NotNull
-
+  @ApiModelProperty(required = false, value = "This indicates whether the Current Subscription is Valid or Not")
 
   public String getIsValid() {
     return isValid;

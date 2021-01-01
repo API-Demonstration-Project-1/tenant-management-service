@@ -5,19 +5,23 @@
  */
 package com.toystore.ecomm.tenants.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.toystore.ecomm.tenants.model.Error;
-import com.toystore.ecomm.tenants.model.Login;
-import com.toystore.ecomm.tenants.model.Loginresponse;
+import javax.validation.Valid;
 
-import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.toystore.ecomm.tenants.model.Error;
+import com.toystore.ecomm.tenants.model.Login;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-16T20:08:56.623Z")
 
@@ -52,7 +56,7 @@ public interface LoginApi {
 
 	@RequestMapping(value = "/login", produces = { "application/json" }, consumes = {
 	"application/json" }, method = RequestMethod.POST)
-	ResponseEntity<Loginresponse> loginPOST(@ApiParam(value = "", required = true) @Valid @RequestBody Login body) throws JsonMappingException, JsonProcessingException;
+	ResponseEntity<String> loginPOST(@ApiParam(value = "", required = true) @Valid @RequestBody Login body) throws JsonMappingException, JsonProcessingException, IllegalAccessException, InstantiationException;
 
 	@ApiOperation(value = "Login_PUT", nickname = "loginPUT", notes = "Update a Login by loginId", response = Login.class, tags = {
 			"login", })

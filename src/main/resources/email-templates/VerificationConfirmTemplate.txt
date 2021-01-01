@@ -1,0 +1,3 @@
+"<h1><center>PTMS - Registration Verification Confirmation</center></h1><br>"
+ + 
+ "<h3>This is to confirm that your Registration has been successfully verified.</h3>"
