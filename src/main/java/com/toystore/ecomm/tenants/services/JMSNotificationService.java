@@ -62,7 +62,7 @@ public class JMSNotificationService {
 		
 		//tenantRepository.updateTenantAsVerified(verificationId);
 		
-		TenantInfo tenantInfo = tenantRepository.findByVerificationId(verificationId).get(0);
+		TenantInfo tenantInfo = tenantRepository.findByContainingVerificationId(verificationId).get(0);
 		
 		TenantInfo updatedTenantInfo = createCustomerSubscriptionInStripe(tenantInfo.getTenantId(), tenantInfo.getTenantName());
 		
