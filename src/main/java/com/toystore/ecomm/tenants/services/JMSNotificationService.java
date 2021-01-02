@@ -46,7 +46,7 @@ public class JMSNotificationService {
 		
 		System.out.println("For Tenant ID: " + tenantId +", this is the Verification ID: " + verificationId);
 		
-		TenantInfo tenantInfo = updateTenantWithVerificationId(Integer.parseInt(tenantId), verificationId);
+		TenantInfo tenantInfo = updateTenantWithVerificationId(Integer.parseInt(tenantId), Integer.parseInt(verificationId));
 		
 		log.trace("Updated Tenant Info POJO: " + tenantInfo);
 	}
@@ -62,7 +62,7 @@ public class JMSNotificationService {
 		
 		//tenantRepository.updateTenantAsVerified(verificationId);
 		
-		TenantInfo tenantInfo = tenantRepository.findByContainingVerificationId(verificationId).get(0);
+		TenantInfo tenantInfo = tenantRepository.findByVerificationId(Integer.parseInt(verificationId)).get(0);
 		
 		TenantInfo updatedTenantInfo = createCustomerSubscriptionInStripe(tenantInfo.getTenantId(), tenantInfo.getTenantName());
 		
@@ -83,7 +83,7 @@ public class JMSNotificationService {
 		
 		System.out.println("For Tenant ID: " + tenantId +", this is the Verification ID: " + verificationId);
 		
-		TenantInfo tenantInfo = updateTenantWithVerificationId(Integer.parseInt(tenantId), verificationId);
+		TenantInfo tenantInfo = updateTenantWithVerificationId(Integer.parseInt(tenantId), Integer.parseInt(verificationId));
 		
 		log.trace("Updated Tenant Info POJO: " + tenantInfo);
 		
@@ -101,7 +101,7 @@ public class JMSNotificationService {
 		
 		//tenantRepository.updateTenantAsVerified(verificationId);
 		
-		TenantInfo tenantInfo = tenantRepository.findByVerificationId(verificationId).get(0);
+		TenantInfo tenantInfo = tenantRepository.findByVerificationId(Integer.parseInt(verificationId)).get(0);
 		
 		TenantInfo updatedTenantInfo = createCustomerSubscriptionInStripe(tenantInfo.getTenantId(), tenantInfo.getTenantName());
 		
@@ -113,7 +113,7 @@ public class JMSNotificationService {
 	}
 	
 	// Update 'TENANT' table with Verification ID from Notification API
-	private TenantInfo updateTenantWithVerificationId(Integer tenantId, String verificationId) {
+	private TenantInfo updateTenantWithVerificationId(Integer tenantId, Integer verificationId) {
 		 TenantInfo tenantInfo = tenantRepository.findByTenantId(tenantId);
 		 
 		 tenantInfo.setVerificationId(verificationId);

@@ -52,4 +52,9 @@ public class PTMSConstants {
 	public static final String SUBS_DATE_PATTERN = "dd-MM-yyyy";
 	
 	public static final String SUBS_TS_PATTERN = "EEE MMM dd HH:mm:ss Z yyyy";
+	
+	public static final String SYSTEM_NAME = "ProArchs Tenant Management System";
+	public static final String SYSTEM_SHORT_NAME = "ptms";
+	public static final String SYSTEM_DESC = "SaaS-based Tenant Management System";
+	
 }

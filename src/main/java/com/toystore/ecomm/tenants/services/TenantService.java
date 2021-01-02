@@ -57,7 +57,7 @@ public class TenantService {
 		tenantRepository.save(existingTenantInfo);
 	}
 	
-	public TenantInfo updateTenantVerification(Integer tenantId, String verificationId) {
+	public TenantInfo updateTenantVerification(Integer tenantId, Integer verificationId) {
 		TenantInfo existingTenant = tenantRepository.findByTenantId(tenantId);
 		
 		existingTenant.setVerificationId(verificationId);

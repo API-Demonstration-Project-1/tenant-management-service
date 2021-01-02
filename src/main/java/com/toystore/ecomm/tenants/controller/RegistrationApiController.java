@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestClientException;
 
 import com.toystore.ecomm.ptms.daorepo.factory.POJOFactory;
 import com.toystore.ecomm.ptms.daorepo.model.TenantInfo;
@@ -322,6 +323,7 @@ public class RegistrationApiController implements RegistrationApi {
 			            			if (isOTPNotification) {
 			            				Map<String, String> elements = new HashMap<String, String>(2);
 			            			    
+			            				elements.put("verificationId", tenantInfo.getVerificationId().toString());
 			            				elements.put("emailId", tenantInfo.getTenantEmail());
 			            			    elements.put("code", code);
 			            			    
@@ -340,6 +342,7 @@ public class RegistrationApiController implements RegistrationApi {
 			            			if (isOTPNotification) {
 			            				Map<String, Object> reqParams = new HashMap<String, Object>(2);
 			            				
+			            				reqParams.put("verificationId", tenantInfo.getVerificationId());
 			            				reqParams.put("emailId", tenantInfo.getTenantEmail());
 			            				reqParams.put("code", code);
 			            				 
@@ -430,20 +433,7 @@ public class RegistrationApiController implements RegistrationApi {
 				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "No Notification Enabled", false, -1);
 				    		
 				    		return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-							
-				    		//Notification for Post Verification Confirmation
-				    		/*if (isNotificationEnabled) {
-				    			notificationService.sendNotification(updatedTenantInfo, NotificationActions.POSTVERIFICATION);
-				    		}*/
-				    		
-				    		
-				    	/*} else {
-				    		log.info("registrationEmailverificationByTenantIdGET() exited");
-				    		
-				    		String resp = ResponsePreparator.prepareRegistrationResponse(null, "Your Verification Code is not correct. Please make sure your Verification Code is correct", false, -1);
-				    		
-				    		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
-				    	}*/
+				    	
 		    		} else {
 		    			log.info("registrationEmailverificationByTenantIdGET() exited");
 		    			
@@ -606,14 +596,13 @@ public class RegistrationApiController implements RegistrationApi {
             try {
             	
             	if (!tenantService.isTenantUsernameUnique(body.getTenantUsername())) {
-            		log.info("registrationPOST() exited");
+            		log.info("registrationPOST() exited - Bad Request");
             		
             		String resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantUsername()  + " Already Exists!!!", false, -1);
-            		
             		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
             	}
             	if (!tenantService.isTenantEmailUnique(body.getTenantEmail())) {
-            		log.info("registrationPOST() exited");
+            		log.info("registrationPOST() exited  - Bad Request");
             		
             		String resp = ResponsePreparator.prepareRegistrationResponse(null, body.getTenantEmail()  + " Already Exists!!!", false, -1);
             		return new ResponseEntity<String>(resp, HttpStatus.BAD_REQUEST);
@@ -633,31 +622,35 @@ public class RegistrationApiController implements RegistrationApi {
             	if (isNotificationEnabled) {
             		if (!isSyncNotificationType) { // Use Messaging Queue (ActiveMQ)
             			if (isOTPNotification) {
-            				Map<String, String> elements = new HashMap<String, String>(3);
+            				Map<String, String> elements = new HashMap<String, String>(5);
             			    
             				elements.put("tenantId", tenantInfo.getTenantId().toString());
+            				elements.put("name", tenantInfo.getTenantName());
             			    elements.put("mobileNum", tenantInfo.getTenantMobile());
             			    elements.put("emailId", tenantInfo.getTenantEmail());
+            			    elements.put("systemName", PTMSConstants.SYSTEM_SHORT_NAME);
             			    
             			    otpVerificationJmsTemplate.convertAndSend(JsonFormatter.convertMapToJson(elements));
             			} else {
-            				Map<String, String> elements = new HashMap<String, String>(3);
+            				Map<String, String> elements = new HashMap<String, String>(6);
             			    
             				elements.put("tenantId", tenantInfo.getTenantId().toString());
             			    elements.put("name", tenantInfo.getTenantName());
             			    elements.put("emailId", tenantInfo.getTenantEmail());
-            			    elements.put("systemName", "ProArchs Tenant Management System");
-            			    elements.put("systemShortName", "ptms");
-            			    elements.put("systemDesc", "SaaS-based Tenant Management System");
+            			    elements.put("systemName", PTMSConstants.SYSTEM_NAME);
+            			    elements.put("systemShortName", PTMSConstants.SYSTEM_SHORT_NAME);
+            			    elements.put("systemDesc", PTMSConstants.SYSTEM_DESC);
             			    
             			    emailVerificationJmsTemplate.convertAndSend(JsonFormatter.convertMapToJson(elements));
             			}
             		} else { // Use API
             			if (isOTPNotification) {
-            				Map<String, Object> reqParams = new HashMap<String, Object>(2);
+            				Map<String, Object> reqParams = new HashMap<String, Object>(4);
             				
+            				reqParams.put("name", tenantInfo.getTenantName());
             				reqParams.put("mobileNum", tenantInfo.getTenantMobile());
             				reqParams.put("emailId", tenantInfo.getTenantEmail());
+            				reqParams.put("systemName", PTMSConstants.SYSTEM_SHORT_NAME);
             				
             				ResponseEntity<String> notificationSrvcResp = ServiceInvoker.invokeNotificationService("http://localhost:8085/pnms/otpverification", reqParams);
             		   		
@@ -673,16 +666,16 @@ public class RegistrationApiController implements RegistrationApi {
             			        return new ResponseEntity<String>(resp, httpStatus);
             				}
             				
-            				tenantInfo.setVerificationId(respJSONObj.getJSONObject("data").getString("id"));
+            				tenantInfo.setVerificationId(respJSONObj.getJSONObject("data").getInt("id"));
             			} else {
             				Map<String, Object> reqParams = new HashMap<String, Object>(6);
             				
             				reqParams.put("tenantId", tenantInfo.getTenantId().toString());
             				reqParams.put("name", tenantInfo.getTenantName());
             				reqParams.put("emailId", tenantInfo.getTenantEmail());
-            				reqParams.put("systemName", "ProArchs Tenant Management System");
-            				reqParams.put("systemShortName", "ptms");
-            				reqParams.put("systemDesc", "SaaS-based Tenant Management System");
+            				reqParams.put("systemName",  PTMSConstants.SYSTEM_NAME);
+            				reqParams.put("systemShortName", PTMSConstants.SYSTEM_SHORT_NAME);
+            				reqParams.put("systemDesc", PTMSConstants.SYSTEM_DESC);
             				
             				ResponseEntity<String> notificationSrvcResp = ServiceInvoker.invokeNotificationService("http://localhost:8085/pnms/emailverification", reqParams);
             		   		
@@ -698,14 +691,11 @@ public class RegistrationApiController implements RegistrationApi {
             			        return new ResponseEntity<String>(resp, httpStatus);
             				}
             				
-            				tenantInfo.setVerificationId(respJSONObj.getJSONObject("data").getString("id"));
+            				tenantInfo.setVerificationId(respJSONObj.getJSONObject("data").getInt("id"));
             			}
             		}
             		
             		tenantService.updateTenantInfo(tenantInfo);
-            	
-	            	//Notification for Welcome Message & Registration Verification
-	            	//notificationService.sendNotification(tenantInfo, NotificationActions.WELCOME);
             	}
             	
             	// Prepare Response
@@ -714,6 +704,12 @@ public class RegistrationApiController implements RegistrationApi {
             	log.info("registrationPOST() exited");
             	
                 return new ResponseEntity<String>(registrationResponse, HttpStatus.CREATED);
+            } catch (RestClientException rce) {
+            	log.info("registrationPOST() exited with Errors");
+                
+                String resp = ResponsePreparator.prepareRegistrationResponse(null, "Notification Service is down - " + rce.getMessage(), false, -1);
+        		
+                return new ResponseEntity<String>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
             	log.info("registrationPOST() exited with Errors");
                 log.error("Couldn't serialize response for content type application/json", e);
